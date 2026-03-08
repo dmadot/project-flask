@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+
+{% block title %}Learn{% endblock %}
+
+{% block body %}
+
+    <h1>Learn</h1>
+    <p>This page explains how to use PlotPie to process and visualize NMR spectra.</p>
+
+    <h2>Session</h2>
+    <p>Before uploading data, a session must be started. The session creates a temporary workspace where uploaded files are processed and stored during use. This ensures that different users can work independently.</p>
+    <p>Sessions are temporary and need to be closed after use.</p>
+
+    <h2>Upload</h2>
+    <p>PlotPie currently supports Bruker NMR datasets.</p>
+
+    <h3>File Requirements</h3>
+    <ul>
+        <li>Only Bruker datasets are supported</li>
+        <li>The dataset must be uploaded as a ZIP archive</li>
+        <li>The ZIP file should contain the original Bruker folder structure</li>
+    </ul>
+    <p>The uploaded archive is automatically extracted and processed by the application.</p>
+
+    <h3>File Naming</h3>
+    <p>Please use simple file names without spaces or special characters, as these may cause issues during processing.</p>
+    <p>Recommended format:</p>
+    <ul>
+        <li>butyl_phenyl_ether.zip</li>
+        <li>sample_1.zip</li>
+    </ul>
+    <p>Avoid names such as:</p>
+    <ul>
+        <li>butyl phenyl ether.zip</li>
+        <li>butyl-phenyl-ether (final).zip</li>
+        <li>sample#1.zip</li>
+    </ul>
+
+    <h2>Processing</h2>
+    <p>After uploading, select your file from the list and choose <strong>Plot</strong> to view the raw FID (Free Induction Decay). Click <strong>FFT</strong> to apply a Fourier Transform and convert the FID into a frequency-domain spectrum.</p>
+
+    <h3>Phase Correction</h3>
+    <p>After the FFT, the spectrum may appear distorted. Use the phase correction controls to fix this:</p>
+    <ul>
+        <li><strong>P0</strong> — zero-order phase correction. Applies a constant phase shift to the entire spectrum.</li>
+        <li><strong>P1</strong> — first-order phase correction. Applies a phase shift that varies linearly across the spectrum.</li>
+    </ul>
+    <p>Adjust P0 and P1 until the peaks appear symmetric and the baseline is flat. Click <strong>Process</strong> to apply the changes.</p>
+    <p>Baseline correction is applied automatically during processing.</p>
+
+    <h3>Window Size</h3>
+    <p>Use the X-Min / X-Max and Y-Min / Y-Max fields to zoom into a region of interest. Click <strong>Process</strong> to update the plot.</p>
+
+    <h2>Peak Detection</h2>
+    <p>PlotPie can automatically detect peaks in the spectrum.</p>
+    <ul>
+        <li>Enable <strong>Show peaks</strong> to mark detected peaks on the plot.</li>
+        <li>Use the <strong>Threshold</strong> field to set the minimum intensity for peak detection. Enable <strong>Show</strong> to display the threshold line on the plot.</li>
+    </ul>
+    <p>Adjust the threshold to filter out noise and focus on real peaks.</p>
+
+    <h2>Integration</h2>
+    <p>Integrals represent the area under a peak and are used to determine the relative number of nuclei.</p>
+    <p>To add an integral, specify:</p>
+    <ul>
+        <li><strong>Name</strong> — a label for the integral region.</li>
+        <li><strong>I0</strong> and <strong>I1</strong> — the left and right boundaries of the integration region (in ppm).</li>
+    </ul>
+    <p>Enable <strong>Show integrals</strong> to display them on the plot. Use <strong>Reset Integrals</strong> to remove all defined integrals.</p>
+
+    <h2>Export</h2>
+    <p>Once the spectrum is processed, you can save the plot as an SVG file using your browser. Right-click the image and select <strong>Save image as</strong>.</p>
+
+{% endblock %}

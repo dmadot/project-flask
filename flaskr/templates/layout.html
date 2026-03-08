@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}{% endblock %} - PlotPie</title>
+    </head>
+    <body>
+        <ul class="navbar">
+            <li><a href="{{ url_for('main.index') }}">PlotPie</a></li>
+            <li><a href="{{ url_for('about.index') }}">About</a></li>
+            <li><a href="{{ url_for('learn.index') }}">Learn</a></li>
+            <li><a href="{{ url_for('nmr.index') }}">NMR</a></li>
+            <li><a href="{{ url_for('plot.index') }}">Plot</a></li>
+            <li><a href="{{ url_for('contact.index') }}">Contact</a></li>
+        </ul>
+        <main class="main-layout">
+            {% block body %}{% endblock %}
+        </main>
+        <footer>
+            
+        </footer>
+    </body>
+</html>

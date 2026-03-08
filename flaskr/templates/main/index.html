@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+
+{% block title %}Main{% endblock %}
+
+{% block body %}
+
+    <h1>Welcome to PlotPie — a free spectrum processing tool.</h1>
+
+    <p>PlotPie helps chemists process and visualize spectral data directly in the browser. The current version focuses on NMR spectra, with plots exportable as SVG.</p>
+    <p>Upload your Bruker dataset and get started on the <a href="{{ url_for('nmr.index') }}">NMR page</a>.</p>
+    <p>Learn more on the <a href="{{ url_for('about.index') }}">About page</a>.</p>
+    
+{% endblock %}

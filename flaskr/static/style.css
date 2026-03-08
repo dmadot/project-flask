@@ -1,0 +1,93 @@
+:root {
+    --nav-color: rgb(240, 240, 240);
+    --nav-bg-1: #333333;
+    --nav-bg-2:  #111111;
+    --page-bg: rgb(240, 240, 240);
+    --px: 100px;
+    --py: 10px;
+    --column: 200px auto 200px;
+}
+
+body {
+    background-color: var(--page-bg);
+    font-family: sans-serif;
+    color: #333333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    padding: 8px 300px;
+}
+
+h1 {
+    font-size: 20px;
+}
+
+h2 {
+    font-size: 18px;
+}
+
+.navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: var(--nav-bg-1);
+    display: flex;
+    font-family: sarif;
+    justify-content: center;
+    padding: 0px 282px;
+}
+
+.navbar li {
+    float: left;
+    border-right: 1px solid #bbbbbb;
+    font-size: 20px;
+}
+
+.navbar li:first-child {
+    border-right: none;
+    margin-right: auto;
+}
+
+.navbar li:last-child {
+    border-right: none;
+    margin-left: auto;
+}
+
+.navbar li a {
+    display: block;
+    color: var(--nav-color);
+    text-align: center;
+    padding: 8px 18px;
+    text-decoration: none;
+}
+
+.navbar li a:hover {
+    background-color: #111111;
+}
+
+.plot {
+    padding: 10px 10px;
+    background-color: white;
+    border-style: solid;
+    border-radius: 25px;
+    border-color: #333333;
+}
+
+.process-form button {
+    margin-top: 20px;
+}
+
+.process-form input[type="number"] {
+    width: 100px;
+}
+
+.process-form input[type="text"] {
+    width: 200px;
+}
