@@ -26,7 +26,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-flask run
+flask --app flaskr run
 ```
 
 Then open your browser at `http://127.0.0.1:5000`.
