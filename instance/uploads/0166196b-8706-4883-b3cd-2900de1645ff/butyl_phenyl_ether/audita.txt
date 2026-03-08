@@ -1,0 +1,26 @@
+##TITLE= Audit trail, TopSpin 4.1.4
+##JCAMPDX= 5.01
+##ORIGIN= Bruker BioSpin GmbH
+##OWNER= root
+$$ /root/.topspin-BladeEpu/local_acqu/OCP-Karpov-1.1/1/audita.txt
+##AUDIT TRAIL=  $$ (NUMBER, WHEN, WHO, WHERE, PROCESS, VERSION, WHAT)
+(   1,<2023-04-27 16:36:58.094 +0000>,<NMR-600SPSP\nmr>,<NMR-600SPSP>,<go4>,<TopSpin 4.1.4>,
+      <acquisition in progress>)
+$$ D:/data/nh/nmr/OCP-Karpov-1.1/1/audita.txt
+(   2,<2023-04-27 16:37:54.178 +0000>,<NMR-600SPSP\nmr>,<NMR-600SPSP>,<go4>,<TopSpin 4.1.4>,
+      <created by zg on 'SpectroSpin 600' (NMR-600SPSP) by user 'NMR-600SPSP\nmr'
+       on data set with UUID 'ba43d44e-e519-11ed-92ad-0013952d3468'
+       started at 2023-04-27 16:36:58.107 +0000, POWCHK enabled, PULCHK disabled,
+       completed at 2023-04-27 16:37:54.175 +0000
+       configuration hash MD5:
+       91 C3 5D E2 F8 63 55 D1 82 3D 34 5D 01 44 FA 46
+       double data hash MD5: 71428
+       A8 B7 EA AB 30 BA A2 B7 32 A5 36 37 D1 9F 0F F5>)
+(   3,<2023-04-27 18:37:17.882 +0200>,<nmr>,<NMR-600SpSp>,<xwish3>,<TopSpin 4.1.4>,
+      <ICON-NMR User ID: nh
+       double data hash MD5: 71428
+       A8 B7 EA AB 30 BA A2 B7 32 A5 36 37 D1 9F 0F F5>)
+##END=
+
+$$ hash MD5
+$$ 03 05 FB 8F CB 15 C7 91 4E F2 E4 0D 70 BC 13 E3

@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+
+{% block title %}About{% endblock %}
+
+{% block body %}
+
+    <h1>About PlotPie</h1>
+    <p>PlotPie is a free tool for processing and visualizing scientific spectral data directly in the browser. The current version focuses on NMR spectra — users can upload a Bruker dataset, process it, and export the plot as SVG.</p>
+    <p>PlotPie is built with Python, using nmrglue for spectral data processing and matplotlib for visualization. The web interface is implemented with Flask and simple HTML forms.</p>
+
+    <h2>Motivation</h2>
+    <p>Preparing spectral figures for scientific publications is often a manual and time-consuming process. One long-term goal of PlotPie is to address the lack of convenient tools for generating TikZ-based spectral plots for LaTeX documents, allowing researchers to produce clean, reproducible figures directly from raw data.</p>
+
+    <h2>Project Status</h2>
+    <p>PlotPie is experimental and under active development. Features may change and additional spectroscopic methods may be added over time.</p>
+
+    <h2>Data Handling</h2>
+    <p>Uploaded files are used only for processing and visualization within the current session. No user data is stored long-term.</p>
+
+    <h2>About the Developer</h2>
+    <p>PlotPie is developed as a personal project by a chemist with a background in analytical chemistry and an interest in scientific computing. The project started as a way to combine chemistry knowledge with self-taught programming skills, with the goal of building practical tools for processing and presenting experimental data.</p>
+    <!-- GitHub: add link here once repository is created -->
+
+{% endblock %}
