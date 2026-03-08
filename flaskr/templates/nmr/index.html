@@ -31,10 +31,10 @@
                         <form id="file-form-{{ loop.index }}" action="{{ url_for('nmr.action') }}" class="file-form" method="post">
                             <input type="hidden" name="filename" value="{{ item }}">
                             <select class="select_action" name="action">
-                                <option value="download">Download</option>
+                                <!-- <option value="download">Download</option> -->
+                                <option value="plot">Plot</option>
                                 <option value="rename">Rename</option>
                                 <option value="delete">Delete</option>
-                                <option value="plot">Plot</option>
                             </select>
                             <button type="submit">OK</button>
                         </form>
