@@ -72,6 +72,22 @@ h2 {
     background-color: #111111;
 }
 
+.session_bar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #444444;
+    display: flex;
+    font-family: sarif;
+    padding: 0px 295px;
+}
+
+.session_bar li {
+    color: #e2e2e2;
+    padding: 1px 5px;
+}
+
 .plot {
     padding: 10px 10px;
     background-color: white;
