@@ -1,0 +1,17 @@
+{
+    "time": {
+        "xmin": null,
+        "xmax": null,
+        "ymin": null,
+        "ymax": null
+    },
+
+    "freq": {
+        "xmin": null,
+        "xmax": null,
+        "ymin": null,
+        "ymax": null,
+        "p0": 0,
+        "p1": 0
+    }
+}

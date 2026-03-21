@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<h1>Frequence domain</h1>
+
+    <img src="data:image/svg+xml;base64,{{ plot }}" alt="Plot" class="plot">
+
+    <form action="{{ url_for('nmr.freq') }}" class="process-form" method="post">
+        <button type="submit">Process</button>
+
+        <input type="hidden" name="filename" value="{{ filename }}">
+        <p>Phase correction</p>
+        <div>
+            <label>P0: <input type="number" name="p0" min="-180" max="180" value="{{ p0 }}" step="any"></label>
+            <label>P1: <input type="number" name="p1" min="-180" max="180" value="{{ p1 }}" step="any"></label>
+        </div>
+
+        <p>Window size</p>
+        <div>
+            <label>X-Min: <input type="number" name="xmin" value="{{ xmin }}" step="any"></label>
+            <label>X-Max: <input type="number" name="xmax" value="{{ xmax }}" step="any"></label>
+        </div>
+        <div>
+            <label>Y-Min: <input type="number" name="ymin" value="{{ ymin }}" step="any"></label>
+            <label>Y-Max: <input type="number" name="ymax" value="{{ ymax }}" step="any"></label>
+        </div>
+
+        <p>Peaks</p>
+        <div>
+            <label>Show peaks: <input type="checkbox" name="show_peaks" {% if show_peaks %}checked{% endif %}></label>
+        </div>
+        <div>
+            <label>Threshold: <input type="number" name="threshold" value="{{ threshold }}" step="any"></label>
+            <label>Show: <input type="checkbox" name="show_threshold" {% if show_threshold %}checked{% endif %}></label>
+        </div>
+    </form>
+
+    <h2>Integration</h2>
+    <form action="{{ url_for('nmr.integrals') }}" method="post">
+        <input type="hidden" name="filename" value="{{ filename }}">
+        <div>
+            <label>Name: <input type="text" name="integral_name"></label>
+            <label>I0: <input type="number" name="i0" step="any"></label>
+            <label>I1: <input type="number" name="i1" step="any"></label>
+            <label>Show: <input type="checkbox" name="show_integrals" {% if show_integrals %}checked{% endif %}></label>
+        </div>
+        <button type="submit">Process</button>
+    </form>
+    
+{% endblock %}

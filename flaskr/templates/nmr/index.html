@@ -6,137 +6,30 @@
 {% block body %}
 
     <h1>NMR</h1>
+    <h2>Upload Bruker File</h2>
+    <form action="{{ url_for('nmr.uploads') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <button type="submit">Upload</button>
+    </form>
 
-    {% if id %}
-
-        <p>Your session id: {{ id }}</p> 
-        <form action="{{ url_for('auth.close_session') }}" method="post">
-            <button type="submit">Close session</button>
-        </form>
-
-        <h2>Upload</h2>
-        <form action="{{ url_for('nmr.uploads') }}" method="post" enctype="multipart/form-data">
-            <input type="file" name="file">
-            <button type="submit">Upload</button>
-        </form>
-
-        <table>
-            {% for item in items %}
-                <tr>
-                    <td>
-                        <span class="item">{{ item }}</span>
-                        <input class="input_new_name" name="new_name" placeholder="{{ item }}" style="display: none" type="text" form="file-form-{{ loop.index }}">
-                    </td>
-                    <td>
-                        <form id="file-form-{{ loop.index }}" action="{{ url_for('nmr.action') }}" class="file-form" method="post">
-                            <input type="hidden" name="filename" value="{{ item }}">
-                            <select class="select_action" name="action">
-                                <!-- <option value="download">Download</option> -->
-                                <option value="plot">Plot</option>
-                                <option value="rename">Rename</option>
-                                <option value="delete">Delete</option>
-                            </select>
-                            <button type="submit">OK</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-
-        <h2>Plot</h2>
-        {% if fid %}
-
-            <img src="data:image/svg+xml;base64,{{ fid }}" alt="FID" class="plot">
-            <form action="{{ url_for('nmr.fid') }}" method="post">
-                <input type="hidden" name="filename" value="{{ fid_name }}">
-                <button type="submit">FFT</button>
-            </form>
-        
-        {% elif plot %}
-
-            <img src="data:image/svg+xml;base64,{{ plot }}" alt="Plot" class="plot">
-
-            <form action="{{ url_for('nmr.fid') }}" class="process-form" method="post">
-                <button type="submit">Process</button>
-
-                <input type="hidden" name="filename" value="{{ plt_name }}">
-                <p>Phase correction</p>
-                <div>
-                    <label>P0: <input type="number" name="p0" min="-180" max="180" value="{{ p0 }}" step="any"></label>
-                    <label>P1: <input type="number" name="p1" min="-180" max="180" value="{{ p1 }}" step="any"></label>
-                </div>
-
-                <p>Window size</p>
-                <div>
-                    <label>X-Min: <input type="number" name="xmin" value="{{ xmin }}" step="any"></label>
-                    <label>X-Max: <input type="number" name="xmax" value="{{ xmax }}" step="any"></label>
-                </div>
-                <div>
-                    <label>Y-Min: <input type="number" name="ymin" value="{{ ymin }}" step="any"></label>
-                    <label>Y-Max: <input type="number" name="ymax" value="{{ ymax }}" step="any"></label>
-                </div>
-
-                <p>Peaks</p>
-                <div>
-                    <label>Show peaks: <input type="checkbox" name="show_peaks" {% if show_peaks %}checked{% endif %}></label>
-                </div>
-                <div>
-                    <label>Threshold: <input type="number" name="threshold" value="{{ threshold }}" step="any"></label>
-                    <label>Show: <input type="checkbox" name="show_threshold" {% if show_threshold %}checked{% endif %}></label>
-                </div>
-
-                <p>Integration</p>
-                <div>
-                    <label>Name: <input type="text" name="iname"></label>
-                    <label>I0: <input type="number" name="i0" step="any"></label>
-                    <label>I1: <input type="number" name="i1" step="any"></label>
-                    <label>Show: <input type="checkbox" name="show_integrals" {% if show_integrals %}checked{% endif %}></label>
-                </div>
-                <div>
-                    <button type="submit" name="reset_integrals" value="reset_integrals">Reset Integrals</button>
-                </div>
-            </form>
-
-        {% else %}
-
-            <p>show placeholder</p>
-
-        {% endif %}
-
-        <script>
-            document.querySelectorAll(".file-form").forEach(function(form) {
-                form.addEventListener("change", function(event) {
-                    let select = form.querySelector(".select_action");
-                    let row = form.closest("tr");
-                    let item = row.querySelector(".item");
-                    let new_name = row.querySelector(".input_new_name");
-
-                    if (select.value == "rename") 
-                    {
-                        item.style.display = "none";
-                        new_name.style.display = "inline";
-                    } 
-                    else 
-                    {
-                        item.style.display = "inline";
-                        new_name.style.display = "none";
-                    }
-                });
-            });
-
-            document.querySelector(".process-form").addEventListener("change", function() {
-                // this.submit();
-            });
-        </script>
-
-    {% else %}
-
-        <p>You must create a session.</p> 
-        <form action="{{ url_for('auth.open_session') }}" method="post">
-            <button type="submit">Open session</button>
-        </form>
-
-    {% endif %}
-    
+    <h2>Your File's</h2>
+    <table>
+        <tr>
+            <td>Name</td>
+            <td>Plot</td>
+            <td>Delete</td>
+        </tr>
+        {% for item in items %}
+            <tr>
+                <td>{{ item }}</td>
+                <td>
+                    <a href="{{ url_for('nmr.time', filename=item) }}">plt</a>
+                </td>
+                <td>
+                    <a href="{{ url_for('nmr.delete', filename=item) }}">rm</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
 
 {% endblock %}
