@@ -1,17 +1,25 @@
 {
-    "time": {
+    "time_axis": {
         "xmin": null,
         "xmax": null,
         "ymin": null,
         "ymax": null
     },
-
-    "freq": {
+    "freq_axis": {
         "xmin": null,
         "xmax": null,
         "ymin": null,
-        "ymax": null,
+        "ymax": null
+    },
+    "freq_phase": {
         "p0": 0,
         "p1": 0
-    }
+    },
+    "freq_peaks": [
+    ],
+    "freq_threshold": {
+        "value": null,
+        "bool": false
+    },
+    "freq_integrals": []
 }

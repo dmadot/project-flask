@@ -24,6 +24,55 @@ def allowed_file(filename):
 
 
 # Build the plot and return to the figure.
+def build_fig_freq(filename):
+    # Load the .settings.json for the current file.
+    settings = settings_load(path_settings(filename))
+    p0 = settings["freq_phase"]["p0"]
+    p1 = settings["freq_phase"]["p1"]
+
+    # Run the function to get the freq domain from the nmr data set.
+    data, ppm_scale, uc = load_freq_domain(path_dataset(filename), p0, p1)
+
+    # Open a figure to create the plot.
+    fig, ax = plt.subplots()
+    ax.plot(ppm_scale, data, "k", lw=1)
+    ax.set_title(filename)
+    ax.set_xlabel("1H / ppm")
+    ax.set_xlim(settings["freq_axis"]["xmin"], settings["freq_axis"]["xmax"])
+    ax.set_ylim(settings["freq_axis"]["ymin"], settings["freq_axis"]["ymax"])
+    ax.invert_xaxis()
+
+    # Plot the peaks.
+    for peak in settings["freq_peaks"]:
+        ppm = peak["ppm"]
+        height = peak["height"]
+        ax.scatter(ppm, height + 0.1, marker="|", color="k")
+        ax.text(ppm, height + 0.3, round(ppm, 2), ha="center", va="center", rotation=90)
+
+    # Plot the integrals.
+    for integral in settings["freq_integrals"]:
+        start = integral["i0"]
+        end = integral["i1"]
+    
+        if start is not None and end is not None:
+            i0 = uc(start, unit="ppm")
+            i1 = uc(end, unit="ppm")
+            if i0 > i1:
+                i0, i1 = i1, i0
+    
+            i_data  = data[i0:i1 + 1]
+            i_scale = ppm_scale[i0:i1 + 1]
+    
+            i_cumsum = i_data.cumsum()
+    
+            ax.plot(i_scale, i_cumsum / 20 + i_data.max() + 0.5, "k")
+            ax.text(i_scale[0], i_cumsum[-1] / 20 + i_data.max() + 0.55, round(i_data.sum(), 2))
+  
+    # if show_threshold:
+    #     ax.hlines(threshold, *uc.ppm_limits(), linestyle="--", color="b")
+
+    return fig
+
 def build_fig_time(filename):
     # Load the .settings.json for the current file.
     settings = settings_load(path_settings(filename))
@@ -36,35 +85,19 @@ def build_fig_time(filename):
     ax.plot(ms_scale, data, "k", lw=1)
     ax.set_title(filename)
     ax.set_xlabel("Time / ms")
-    ax.set_xlim(settings["time"]["xmin"], settings["time"]["xmax"])
-    ax.set_ylim(settings["time"]["ymin"], settings["time"]["ymax"])
+    ax.set_xlim(settings["time_axis"]["xmin"], settings["time_axis"]["xmax"])
+    ax.set_ylim(settings["time_axis"]["ymin"], settings["time_axis"]["ymax"])
     return fig
-
-def build_fig_freq(filename):
-    # Load the .settings.json for the current file.
-    settings = settings_load(path_settings(filename))
-
-    p0 = settings
-    p1 = settings
-
-    # Run the function to get the freq domain from the nmr data set.
-    data, ppm_scale = load_freq_domain(file_path(), p0, p1)
-
-    # Open a figure to create the plot.
-    fig, ax = plt.subplots()
-    ax.plot(ppm_scale, data, "k", lw=1)
-    ax.invert_xaxis()
-    ax.set_title(filename)
-    ax.set_xlabel("1H / ppm")
-    ax.set_xlim(settings["freq"]["xmin"], settings["freq"]["xmax"])
-    ax.set_ylim(settings["freq"]["ymin"], settings["freq"]["ymax"])
-    return True
 
 
 # Return a float or None (float() dont work on None)
 def form_float(key):
     val = request.form.get(key)
     return float(val) if val else None
+
+def form_zero(key):
+    val = request.form.get(key)
+    return float(val) if val else float(0)
 
 
 # Proces the dataset and return the values for the plot.
@@ -83,7 +116,7 @@ def load_freq_domain(path, p0, p1):
     data = data / data.max()
 
     ppm_scale = uc.ppm_scale()
-    return data, ppm_scale
+    return data, ppm_scale, uc
 
 def load_time_domain(path):
     dic, data = ng.bruker.read(path)                                                                                                                                                                                                    
@@ -130,7 +163,8 @@ def settings_load(path):
 def settings_save(path, settings, route, key, value):
     settings[route][key] = value
     with open(path, "w") as f:
-        json.dump(settings, f)
+        json.dump(settings, f, indent=4)
+
 
 
 @bp.route("/")
@@ -177,7 +211,7 @@ def uploads():
         return redirect(url_for("nmr.index"))
 
 
-@bp.route("/uploads/<filename>/delete")
+@bp.route("/uploads/<filename>/delete", methods=["POST"])
 @session_required
 def delete(filename):
     path = path_file(filename)
@@ -185,22 +219,16 @@ def delete(filename):
     return redirect(url_for("nmr.index"))
 
 
-@bp.route("/time/<filename>", methods=["GET", "POST"])
+@bp.route("/time/<filename>")
 @session_required
 def time(filename):
-    # Create the plot.
     fig = build_fig_time(filename)
-
-    # Save the figure to a temporary buffer in RAM.
     svg_buffer = render_svg(fig)
-
-    # Encode binary SVG data to a Base64 string for direct embedding in HTML.
     svg_b64 = base64.b64encode(svg_buffer.read()).decode("utf-8")
-
-    # Close the figure to evoid memory leak.
     plt.close(fig)
 
-    return render_template("nmr/time.html", figure=svg_b64, filename=filename)
+    settings = settings_load(path_settings(filename))
+    return render_template("nmr/time.html", figure=svg_b64, filename=filename, settings=settings)
 
 
 @bp.route("/time/<filename>/axis", methods=["POST"])
@@ -209,8 +237,8 @@ def time_axis(filename):
     path = path_settings(filename)
     settings = settings_load(path)
 
-    for key in settings["time"].keys():
-        settings_save(path, settings, "time", key, form_float(key))
+    for key in settings["time_axis"].keys():
+        settings_save(path, settings, "time_axis", key, form_float(key))
 
     return redirect(url_for("nmr.time", filename=filename))
 
@@ -218,117 +246,154 @@ def time_axis(filename):
 @bp.route("/time/<filename>/download")
 @session_required
 def time_download(filename):
-    # Create the plot.
     fig = build_fig_time(filename)
-
-    # Save the figure to a temporary buffer in RAM.
     svg_buffer = render_svg(fig)
-
-    # Close the figure to avoid memory leak.
     plt.close(fig)
 
     return send_file(svg_buffer, mimetype="image/svg+xml", as_attachment=True, download_name=f"{filename}_time.svg")
 
 
-@bp.route("/freq/<filename>", methods=["GET", "POST"])
+
+@bp.route("/freq/<filename>")
 @session_required
 def freq(filename):
-    # Create the plot.
     fig = build_fig_freq(filename)
-
-    # Save the figure to a temporary buffer in RAM.
-    svg_buffer = render_template(fig)
-
-    # Encode binary SVG data to a Base64 string for direct embedding in HTML.
+    svg_buffer = render_svg(fig)
     svg_b64 = base64.b64encode(svg_buffer.read()).decode("utf-8")
-
-    # Close the figure to evoid memory leak.
     plt.close(fig)
 
-    return render_template("nmr/freq.html", plot=svg_b64, filename=filename)
+    settings = settings_load(path_settings(filename))
+    return render_template("nmr/freq.html", figure=svg_b64, filename=filename, settings=settings)
 
 
-@bp.route("/freq/<filename>/peaks")
+@bp.route("/freq/<filename>/axis", methods=["POST"])
 @session_required
-def peaks():
+def freq_axis(filename):
+    path = path_settings(filename)
+    settings = settings_load(path)
+
+    for key in settings["freq_axis"].keys():
+        settings_save(path, settings, "freq_axis", key, form_float(key))
+
+    return redirect(url_for("nmr.freq", filename=filename))
+
+
+@bp.route("/freq/<filename>/peaks", methods=["POST"])
+@session_required
+def freq_peaks(filename):
     threshold = form_float("threshold")
     show_peaks = bool(request.form.get("show_peaks")) 
     show_threshold = bool(request.form.get("show_threshold"))
 
+    path = path_settings(filename)
+    settings = settings_load(path)
+
+    p0 = settings["freq_phase"]["p0"]
+    p1 = settings["freq_phase"]["p1"]
+
+    data, ppm_scale, uc = load_freq_domain(path_dataset(filename), p0, p1)
+
+    list_peaks = []
+
     if threshold:
-        if show_peaks:
-            peaks = ng.peakpick.pick(data, pthres = threshold, algorithm="downward")
-            for peak in peaks:
-                height = data[int(peak["X_AXIS"])]
-                ppm = uc.ppm(peak["X_AXIS"])
-                ax.scatter(ppm, height + 0.1, marker="|", color="k")
-                ax.text(ppm, height + 0.3, round(ppm, 2), ha="center", va="center", rotation=90)
-        
-            if show_threshold:
-                ax.hlines(threshold, *uc.ppm_limits(), linestyle="--", color="b")
+        peaks = ng.peakpick.pick(data, pthres=threshold, algorithm="downward")
+        for n, peak in enumerate(peaks, start=1):
+            height = float(data[int(peak["X_AXIS"])])
+            ppm = float(uc.ppm(peak["X_AXIS"]))
+            list_peaks.append({"id": n, "ppm": ppm, "height": height})
 
-    return True
+    settings["freq_peaks"] = list_peaks
+    with open(path, "w") as f:
+        json.dump(settings, f, indent=4)
+
+    return redirect(url_for("nmr.freq", filename=filename))
 
 
-@bp.route("/freq/integrals", methods=["POST", "GET"])
+@bp.route("freq/<filename>/peaks/delete", methods=["POST"])
 @session_required
-def integrals():
-    if "integrals" not in session:
-        session["integrals"] = []
+def freq_peak_delete(filename):
+    peak_id = int(request.form.get("peak_id")) 
+    path = path_settings(filename)
+    settings = settings_load(path)
 
-    integral_name = request.form.get("integral_name")
+    temp_peaks = settings["freq_peaks"]
+
+    # Find the peak and delete it.
+    for peak in temp_peaks:
+        if peak["id"] == peak_id:
+            temp_peaks.remove(peak)
+            break 
+
+    # Distribute new peak_is's
+    for n, peak in enumerate(temp_peaks, start=1):
+        peak["id"] = n
+
+    settings["freq_peaks"] = temp_peaks
+
+    with open(path, "w") as f:
+        json.dump(settings, f, indent=4)
+
+    return redirect(url_for("nmr.freq", filename=filename))
+
+
+@bp.route("freq/<filename>/peaks/zoom", methods=["POST"])
+@session_required
+def freq_peak_zoom(filename):
+    peak_id = int(request.form.get("peak_id"))
+    path = path_settings(filename)
+    settings = settings_load(path)
+
+    for peak in settings["freq_peaks"]:
+        if peak["id"] == peak_id:
+            settings["freq_axis"]["xmin"] = peak["ppm"] - 0.1
+            settings["freq_axis"]["xmax"] = peak["ppm"] + 0.1
+            break
+
+    with open(path, "w") as f:
+        json.dump(settings, f, indent=4)
+
+    return redirect(url_for("nmr.freq", filename=filename))
+
+
+@bp.route("freq/<filename>/phase", methods=["POST"])
+@session_required
+def freq_phase(filename):
+    path = path_settings(filename)
+    settings = settings_load(path)
+
+    for key in settings["freq_phase"].keys():
+        settings_save(path, settings, "freq_phase", key, form_zero(key))
+
+    return redirect(url_for("nmr.freq", filename=filename)) 
+
+
+@bp.route("/freq/<filename>/integrals", methods=["POST"])
+@session_required
+def freq_integrals(filename):
     i0 = form_float("i0")
     i1 = form_float("i1")
+    path = path_settings(filename)
+    settings = settings_load(path)
 
-    new_dict_item = {
-        "number": "1",
-        "integral_name": request.form.get("integral_name"),
-        "start": form_float("i0"),
-        "end": form_float("i1")
-    }
+    temp_integrals = {"id": None, "i0": i0, "i1": i1, "area": None}
+    settings["freq_integrals"].append(temp_integrals)
 
-    temp_list = session["integrals"]
-    temp_list.append(new_dict_item)
-    session["integrals"] = temp_list
+    for n, integral in enumerate(settings["freq_integrals"], start=1):
+        integral["id"] = n
 
+    with open(path, "w") as f:
+        json.dump(settings, f, indent=4)
 
-    if request.form.get("reset_integrals") == "reset_integrals":
-        session.pop("integrals", None)
-    
-
-    show_integrals = bool(request.form.get("show_integrals"))
-    start, end = None, None
-
-    if show_integrals:
-        for integral in session["integrals"]:
-            start = integral["i0"]
-            end = integral["i1"]
-
-            if start is not None and end is not None:
-                i0 = uc(start, unit="ppm")
-                i1 = uc(end, unit="ppm")
-                if i0 > i1:
-                    i0, i1 = i1, i0
-
-                i_data  = data[i0:i1 + 1]
-                i_scale = ppm_scale[i0:i1 + 1]
-
-                i_cumsum = i_data.cumsum()
-
-                ax.plot(i_scale, i_cumsum / 20 + i_data.max() + 0.5, "k")
-                ax.text(i_scale[0], i_cumsum[-1] / 20 + i_data.max() + 0.55, round(i_data.sum(), 2))
-                ax.text(i_scale[0], i_cumsum[-1] / 20 + i_data.max() + 0.65, integral["peak"])
-
-    return redirect(url_for("nmr.freq"))
+    return redirect(url_for("nmr.freq", filename=filename))
 
 
-@bp.route("freq/integrals/reset")
+@bp.route("freq/<filename>/integrals/reset", methods=["POST"])
 @session_required
 def integrals_reset():
     return True
 
 
-@bp.route("/freq/download")
+@bp.route("/freq/<filename>/download")
 @session_required
 def freq_download():
     return True
