@@ -11,17 +11,17 @@
     
     <img src="data:image/svg+xml;base64,{{ figure }}" alt="Time-Domain NMR" class="plot">
 
-    <form method="post">
-        <p>Window size</p>
+    <h2>Window size</h2>
+    <form action="{{ url_for('nmr.time_axis', filename=filename) }}" method="post">
+        <button type="submit">Process</button>
         <div>
-            <label>X-Min: <input type="number" name="xmin" value="{{ xmin }}" step="any"></label>
-            <label>X-Max: <input type="number" name="xmax" value="{{ xmax }}" step="any"></label>
+            <label>X-Min: <input type="number" name="xmin" value="{{ settings['time_axis']['xmin'] }}" step="any"></label>
+            <label>X-Max: <input type="number" name="xmax" value="{{ settings['time_axis']['xmax'] }}" step="any"></label>
         </div>
         <div>
-            <label>Y-Min: <input type="number" name="ymin" value="{{ ymin }}" step="any"></label>
-            <label>Y-Max: <input type="number" name="ymax" value="{{ ymax }}" step="any"></label>
+            <label>Y-Min: <input type="number" name="ymin" value="{{ settings['time_axis']['ymin'] }}" step="any"></label>
+            <label>Y-Max: <input type="number" name="ymax" value="{{ settings['time_axis']['ymax'] }}" step="any"></label>
         </div>
-        <button formaction="{{ url_for('nmr.time_axis', filename=filename) }}" type="submit">Process</button>
     </form>
 
 {% endblock %}

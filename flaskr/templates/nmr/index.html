@@ -26,7 +26,9 @@
                     <a href="{{ url_for('nmr.time', filename=item) }}">plt</a>
                 </td>
                 <td>
-                    <a href="{{ url_for('nmr.delete', filename=item) }}">rm</a>
+                    <form action="{{ url_for('nmr.delete', filename=item) }}" method="post">
+                        <button type="submit">rm</button>
+                    </form>
                 </td>
             </tr>
         {% endfor %}
