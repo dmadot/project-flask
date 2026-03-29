@@ -26,7 +26,8 @@ def allowed_file(filename):
 # Build the plot and return to the figure.
 def build_fig_freq(filename):
     # Load the .settings.json for the current file.
-    settings = settings_load(path_settings(filename))
+    path = path_settings(filename)
+    settings = settings_load(path)
     p0 = settings["freq_phase"]["p0"]
     p1 = settings["freq_phase"]["p1"]
 
@@ -51,25 +52,26 @@ def build_fig_freq(filename):
 
     # Plot the integrals.
     for integral in settings["freq_integrals"]:
-        start = integral["i0"]
-        end = integral["i1"]
+        start = integral["start"]
+        end = integral["end"]
+        area = round(integral["area"], 2)
+
+        i0 = uc(start, "ppm")
+        i1 = uc(end, "ppm")
+
+        if i0 > i1:
+            i0, i1 = i1, i0
     
-        if start is not None and end is not None:
-            i0 = uc(start, unit="ppm")
-            i1 = uc(end, unit="ppm")
-            if i0 > i1:
-                i0, i1 = i1, i0
-    
-            i_data  = data[i0:i1 + 1]
-            i_scale = ppm_scale[i0:i1 + 1]
-    
-            i_cumsum = i_data.cumsum()
-    
-            ax.plot(i_scale, i_cumsum / 20 + i_data.max() + 0.5, "k")
-            ax.text(i_scale[0], i_cumsum[-1] / 20 + i_data.max() + 0.55, round(i_data.sum(), 2))
+        i_data  = data[i0:i1 + 1]
+        i_scale = ppm_scale[i0:i1 + 1]
+
+        i_cumsum = i_data.cumsum()
+
+        ax.plot(i_scale, i_cumsum / 20 + i_data.max() + 0.5, "k", lw=1)
+        ax.text(i_scale[0], i_cumsum[-1] / 20 + i_data.max() + 0.55, area)
   
-    # if show_threshold:
-    #     ax.hlines(threshold, *uc.ppm_limits(), linestyle="--", color="b")
+    if settings["freq_threshold"]["bool"]:
+        ax.hlines(settings["freq_threshold"]["value"], *uc.ppm_limits(), linestyle="--", color="k", lw=1)
 
     return fig
 
@@ -90,14 +92,24 @@ def build_fig_time(filename):
     return fig
 
 
-# Return a float or None (float() dont work on None)
+# Return a float or None/0 (float() dont work on None)
 def form_float(key):
     val = request.form.get(key)
-    return float(val) if val else None
+    if not val:
+        return None
+    try:
+        return float(val)
+    except ValueError:
+        abort(400, "Invalid number")
 
 def form_zero(key):
     val = request.form.get(key)
-    return float(val) if val else float(0)
+    if not val:
+        return int(0)
+    try:
+        return float(val)
+    except ValueError:
+        abort(400, "Invalid number")
 
 
 # Proces the dataset and return the values for the plot.
@@ -132,19 +144,19 @@ def load_time_domain(path):
 
 
 # Path functions.
-def path_dataset(filename):
+def path(filename):
     path = os.path.join(current_app.config["UPLOAD_FOLDER"], session.get("id"))
-    file_path = os.path.join(path, filename)
-    return os.path.join(file_path + "/.dataset")
-
-def path_file(filename):
-    path = os.path.join(current_app.config["UPLOAD_FOLDER"], session.get("id"))
+    if not os.path.isdir(path):
+        abort(400, "Path not found")
+    if filename not in os.listdir(path):
+        abort(400, "Path not found")
     return os.path.join(path, filename)
 
+def path_dataset(filename):
+    return os.path.join(path(filename), ".dataset")
+
 def path_settings(filename):
-    path = os.path.join(current_app.config["UPLOAD_FOLDER"], session.get("id"))
-    file_path = os.path.join(path, filename)
-    return os.path.join(file_path + "/.settings.json")
+    return os.path.join(path(filename), ".settings.json")
 
 
 # Renders figure to buffer.
@@ -171,7 +183,9 @@ def settings_save(path, settings, route, key, value):
 @session_required
 def index():
     path = os.path.join(current_app.config["UPLOAD_FOLDER"], session.get("id"))
-    if os.path.isdir(path):
+    if not os.path.isdir(path):
+        abort(400, "Path not found")
+    else:
         items = os.listdir(path)
 
     return render_template("nmr/index.html", items=items)
@@ -190,6 +204,10 @@ def uploads():
 
     else:
         filename = Path(secure_filename(file.filename)).stem
+        
+        if not filename:
+            abort(400, "Invalid filename")
+
         path = os.path.join(current_app.config["UPLOAD_FOLDER"], session.get("id"))
         file_path = os.path.join(path, filename)
         os.makedirs(file_path)
@@ -214,8 +232,7 @@ def uploads():
 @bp.route("/uploads/<filename>/delete", methods=["POST"])
 @session_required
 def delete(filename):
-    path = path_file(filename)
-    shutil.rmtree(path)
+    shutil.rmtree(path(filename))
     return redirect(url_for("nmr.index"))
 
 
@@ -253,7 +270,6 @@ def time_download(filename):
     return send_file(svg_buffer, mimetype="image/svg+xml", as_attachment=True, download_name=f"{filename}_time.svg")
 
 
-
 @bp.route("/freq/<filename>")
 @session_required
 def freq(filename):
@@ -282,11 +298,10 @@ def freq_axis(filename):
 @session_required
 def freq_peaks(filename):
     threshold = form_float("threshold")
-    show_peaks = bool(request.form.get("show_peaks")) 
-    show_threshold = bool(request.form.get("show_threshold"))
-
     path = path_settings(filename)
     settings = settings_load(path)
+
+    settings["freq_threshold"]["value"] = threshold
 
     p0 = settings["freq_phase"]["p0"]
     p1 = settings["freq_phase"]["p1"]
@@ -297,12 +312,17 @@ def freq_peaks(filename):
 
     if threshold:
         peaks = ng.peakpick.pick(data, pthres=threshold, algorithm="downward")
-        for n, peak in enumerate(peaks, start=1):
+        for peak in peaks:
             height = float(data[int(peak["X_AXIS"])])
             ppm = float(uc.ppm(peak["X_AXIS"]))
-            list_peaks.append({"id": n, "ppm": ppm, "height": height})
+            list_peaks.append({"id": None, "ppm": ppm, "height": height})
 
-    settings["freq_peaks"] = list_peaks
+    sorted_peaks = sorted(list_peaks, key=lambda x: x["ppm"], reverse=True)
+
+    for n, peak in enumerate(sorted_peaks, start=1):
+        peak["id"] = n
+
+    settings["freq_peaks"] = sorted_peaks
     with open(path, "w") as f:
         json.dump(settings, f, indent=4)
 
@@ -312,9 +332,16 @@ def freq_peaks(filename):
 @bp.route("freq/<filename>/peaks/delete", methods=["POST"])
 @session_required
 def freq_peak_delete(filename):
-    peak_id = int(request.form.get("peak_id")) 
+    try:
+        peak_id = int(request.form.get("peak_id"))
+    except (ValueError, TypeError):
+        abort(400, "Invalid id")
+    
     path = path_settings(filename)
     settings = settings_load(path)
+
+    if peak_id not in [peak["id"] for peak in settings["freq_peaks"]]:
+        abort(400, "Invalid id")
 
     temp_peaks = settings["freq_peaks"]
 
@@ -336,12 +363,50 @@ def freq_peak_delete(filename):
     return redirect(url_for("nmr.freq", filename=filename))
 
 
+@bp.route("freq/<filename>/threshold", methods=["POST"])
+@session_required
+def freq_threshold(filename):
+    path = path_settings(filename)
+    settings = settings_load(path)
+
+    if settings["freq_threshold"]["bool"]:
+        settings["freq_threshold"]["bool"] = False
+    else:
+        settings["freq_threshold"]["bool"] = True
+
+    with open(path, "w") as f:
+        json.dump(settings, f, indent=4)
+
+    return redirect(url_for("nmr.freq", filename=filename))
+
+
+@bp.route("freq/<filename>/peaks/reset", methods=["POST"])
+@session_required
+def freq_peaks_reset(filename):
+    path = path_settings(filename)
+    settings = settings_load(path)
+    
+    settings["freq_peaks"] = []
+
+    with open(path, "w") as f:
+        json.dump(settings, f, indent=4)
+
+    return redirect(url_for("nmr.freq", filename=filename))
+
+
 @bp.route("freq/<filename>/peaks/zoom", methods=["POST"])
 @session_required
 def freq_peak_zoom(filename):
-    peak_id = int(request.form.get("peak_id"))
+    try:
+        peak_id = int(request.form.get("peak_id"))
+    except (ValueError, TypeError):
+        abort(400, "Invalid id")
+    
     path = path_settings(filename)
     settings = settings_load(path)
+
+    if peak_id not in [peak["id"] for peak in settings["freq_peaks"]]:
+        abort(400, "Invalid id")
 
     for peak in settings["freq_peaks"]:
         if peak["id"] == peak_id:
@@ -370,16 +435,38 @@ def freq_phase(filename):
 @bp.route("/freq/<filename>/integrals", methods=["POST"])
 @session_required
 def freq_integrals(filename):
-    i0 = form_float("i0")
-    i1 = form_float("i1")
+    start = form_float("start")
+    end = form_float("end")
+
+    if start is None or end is None:
+        abort(400, "Start and end are required")
+
     path = path_settings(filename)
     settings = settings_load(path)
 
-    temp_integrals = {"id": None, "i0": i0, "i1": i1, "area": None}
-    settings["freq_integrals"].append(temp_integrals)
+    p0 = settings["freq_phase"]["p0"]
+    p1 = settings["freq_phase"]["p1"]
 
-    for n, integral in enumerate(settings["freq_integrals"], start=1):
+    data, ppm_scale, uc = load_freq_domain(path_dataset(filename), p0, p1)
+
+    i0 = uc(start, "ppm")
+    i1 = uc(end, "ppm")
+
+    if i0 > i1:
+        i0, i1 = i1, i0
+
+    i_data  = data[i0:i1 + 1]
+    area = i_data.sum()
+
+    new_integrals = {"id": None, "start": start, "end": end, "area": area}
+    settings["freq_integrals"].append(new_integrals)
+
+    sorted_integrals = sorted(settings["freq_integrals"], key=lambda x: x["start"], reverse=True)
+
+    for n, integral in enumerate(sorted_integrals, start=1):
         integral["id"] = n
+
+    settings["freq_integrals"] = sorted_integrals
 
     with open(path, "w") as f:
         json.dump(settings, f, indent=4)
@@ -387,13 +474,62 @@ def freq_integrals(filename):
     return redirect(url_for("nmr.freq", filename=filename))
 
 
-@bp.route("freq/<filename>/integrals/reset", methods=["POST"])
+@bp.route("freq/<filename>/integrals/delete", methods=["POST"])
 @session_required
-def integrals_reset():
-    return True
+def freq_integrals_delete(filename):
+    try:
+        integral_id = int(request.form.get("integral_id"))
+    except (ValueError, TypeError):
+        abort (400, "Invalid id")
+
+    path = path_settings(filename)
+    settings = settings_load(path)
+
+    if integral_id not in [integral["id"] for integral in settings["freq_integrals"]]:
+        abort(400, "Invalid id")
+
+    temp_integrals = settings["freq_integrals"]
+
+    for integral in temp_integrals:
+        if integral["id"] == integral_id:
+            temp_integrals.remove(integral)
+            break
+    
+    settings["freq_integrals"] = temp_integrals
+
+    sorted_integrals = sorted(settings["freq_integrals"], key=lambda x: x["start"], reverse=True)
+
+    for n, integral in enumerate(sorted_integrals, start=1):
+        integral["id"] = n
+
+    settings["freq_integrals"] = sorted_integrals
+
+    with open(path, "w") as f:
+        json.dump(settings, f, indent=4)
+
+    return redirect(url_for("nmr.freq", filename=filename))
+
+
+@bp.route("freq/<filename>/integral/reset", methods=["POST"])
+@session_required
+def freq_integrals_reset(filename):
+    path = path_settings(filename)
+    settings = settings_load(path)
+    
+    settings["freq_integrals"] = []
+
+    with open(path, "w") as f:
+        json.dump(settings, f, indent=4)
+
+    return redirect(url_for("nmr.freq", filename=filename))
 
 
 @bp.route("/freq/<filename>/download")
 @session_required
-def freq_download():
-    return True
+def freq_download(filename):
+    fig = build_fig_freq(filename)
+    svg_buffer = render_svg(fig)
+    plt.close(fig)
+
+    return send_file(svg_buffer, mimetype="image/svg+xml", as_attachment=True, download_name=f"{filename}_time.svg")
+

@@ -12,36 +12,25 @@
             <li><a href="{{ url_for('learn.index') }}">Learn</a></li>
             <li><a href="{{ url_for('nmr.index') }}">NMR</a></li>
             <li><a href="{{ url_for('plot.index') }}">Plot</a></li>
-            <li><a href="{{ url_for('contact.index') }}">Contact</a></li>
+            <li>
+                {% if g.user %}
+                    <form action="{{ url_for('auth.close_session', next=request.path) }}" method="post">
+                        <button type="submit">Close session</button>
+                    </form>
+                {% elif not g.user %}
+                    <form action="{{ url_for('auth.open_session', next=request.path) }}" method="post">
+                        <button type="submit">Open session</button>
+                    </form>
+                {% endif %}
+            </li>
         </ul>
-        <div>
-            {% if g.user %}
-                <ul class="session_bar">
-                    <li>
-                        <form action="{{ url_for('auth.close_session', next=request.path) }}" method="post">
-                            <button type="submit">Close session</button>
-                        </form>                        
-                    </li>
-                    <li>
-                        <span>Session active</span>
-                    </li>
-                </ul>
-            {% elif not g.user %}
-                <ul class="session_bar">
-                    <li>
-                        <form action="{{ url_for('auth.open_session', next=request.path) }}" method="post">
-                            <button type="submit">Open session</button>
-                        </form>
-                    </li>
-                </ul>
-            {% endif %}
 
-        </div>
         <main class="main-layout">
             {% block body %}{% endblock %}
         </main>
+
         <footer>
-            
+            <center>&#169 Dimitri Karpov</center>
         </footer>
     </body>
 </html>

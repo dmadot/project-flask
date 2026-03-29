@@ -1,8 +1,9 @@
 :root {
-    --nav-color: rgb(240, 240, 240);
+    --nav-color: #eeeeee;
     --nav-bg-1: #333333;
     --nav-bg-2:  #111111;
-    --page-bg: rgb(240, 240, 240);
+    --nav-bg-3: #444444;
+    --page-bg: #eeeeee;
     --px: 100px;
     --py: 10px;
     --column: 200px auto 200px;
@@ -11,12 +12,21 @@
 body {
     background-color: var(--page-bg);
     font-family: sans-serif;
-    color: #333333;
+    color: var(--nav-bg-1);
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    padding-bottom: 100px;
+}
+
+footer {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--nav-bg-3);
+    color: white;
+    position: fixed;
 }
 
 main {
@@ -26,22 +36,43 @@ main {
 
 h1 {
     font-size: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 h2 {
     font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.button {
+    background-color: var(--page-bg);
+    color: var(--nav-bg-1);
+    border-color: var(--nav-bg-1);
+    border-style: solid;
+    border-radius: 5px;
+    border-width: 1px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.button:hover {
+    background-color: #dddddd;
 }
 
 .navbar {
+    margin: 0%;
     list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
+    padding-top: 5px;
+    padding-bottom: 0px;
+    padding-left: 282px;
+    padding-right: 282px;
     background-color: var(--nav-bg-1);
     display: flex;
     font-family: sarif;
-    justify-content: center;
-    padding: 0px 282px;
 }
 
 .navbar li {
@@ -66,34 +97,45 @@ h2 {
     text-align: center;
     padding: 8px 18px;
     text-decoration: none;
+    border-bottom: 5px solid var(--nav-bg-1);
 }
 
 .navbar li a:hover {
-    background-color: #111111;
+    border-bottom: 5px solid var(--nav-color);
 }
 
-.session_bar {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #444444;
-    display: flex;
-    font-family: sarif;
-    padding: 0px 295px;
-}
+.navbar li form {
+    display: block;                                                                                               
+}                                                                                                                 
 
-.session_bar li {
-    color: #e2e2e2;
-    padding: 1px 5px;
+.navbar li button {                                                                                               
+    display: block;
+    color: var(--nav-color);
+    text-align: center;
+    padding: 8px 18px;
+    text-decoration: none;
+    border-bottom: 5px solid var(--nav-bg-1);                                                                     
+    /* reset default button styles */
+    background: none;                                                                                             
+    border-top: none;                                                                                             
+    border-left: none;
+    border-right: none;                                                                                           
+    font-size: inherit;
+    font-family: inherit;                                                                                         
+    cursor: pointer;
+}                                                                                                                 
+                
+.navbar li button:hover {
+    border-bottom: 5px solid var(--nav-color);
 }
 
 .plot {
     padding: 10px 10px;
     background-color: white;
     border-style: solid;
-    border-radius: 25px;
-    border-color: #333333;
+    border-radius: 10px;
+    border-color: var(--nav-bg-1);
+    border-width: 3px;
 }
 
 .process-form button {
@@ -107,3 +149,23 @@ h2 {
 .process-form input[type="text"] {
     width: 200px;
 }
+
+.split-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;   
+}
+
+.table-settings td {
+    height: 30px;
+}
+
+.table-settings td:nth-child(1) {
+    width: 100px;
+}
+
+.table-settings td:nth-child(3) {
+    width: 100px;
+    padding-left: 10px;
+}
+
