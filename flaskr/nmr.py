@@ -76,7 +76,6 @@ def build_fig_freq(filename):
     return fig
 
 def build_fig_time(filename):
-    # Load the .settings.json for the current file.
     settings = settings_load(path_settings(filename))
 
     # Run the function to get the time domain from the nmr data set.
@@ -92,7 +91,7 @@ def build_fig_time(filename):
     return fig
 
 
-# Return a float or None/0 (float() dont work on None)
+# Return a float or None or 0 (float() dont work on None).
 def form_float(key):
     val = request.form.get(key)
     if not val:
@@ -120,14 +119,14 @@ def load_freq_domain(path, p0, p1):
     udic = ng.bruker.guess_udic(dic, data)
     uc = ng.fileiobase.uc_from_udic(udic)
 
-    data = ng.proc_base.fft(data)
-    data = ng.proc_base.ps(data, p0=p0, p1=p1)
-    data = ng.proc_base.di(data)
-    data = ng.proc_base.rev(data)
-    data = ng.proc_bl.baseline_corrector(data, wd=20)
-    data = data / data.max()
+    data = ng.proc_base.fft(data)                       # fourier transform
+    data = ng.proc_base.ps(data, p0=p0, p1=p1)          # phase correction
+    data = ng.proc_base.di(data)                        # discard the imaginaries
+    data = ng.proc_base.rev(data)                       # reverse the data
+    data = ng.proc_bl.baseline_corrector(data, wd=20)   # calculate a baseline using a distribution based classification method
+    data = data / data.max()                            # harmonize data
+    ppm_scale = uc.ppm_scale()                          # converting to ppm
 
-    ppm_scale = uc.ppm_scale()
     return data, ppm_scale, uc
 
 def load_time_domain(path):
@@ -161,6 +160,7 @@ def path_settings(filename):
 
 # Renders figure to buffer.
 def render_svg(fig):
+    # AI-assisted: using io.BytesIO() as an in-memory buffer to capture the SVG output
     buffer = io.BytesIO()
     fig.savefig(buffer, format="svg")
     buffer.seek(0)
@@ -218,6 +218,7 @@ def uploads():
         with open(file_path + f"/.settings.json", "w") as f:
             json.dump(settings_load(default_settings_path), f)
 
+        # AI-assisted: hardening the ZIP upload to prevent path traversal attacks
         if zipfile.is_zipfile(file):
             with zipfile.ZipFile(file) as zf:
                 for member in zf.namelist():
@@ -241,6 +242,8 @@ def delete(filename):
 def time(filename):
     fig = build_fig_time(filename)
     svg_buffer = render_svg(fig)
+
+    # AI-assisted: base64 encoding and embedding of the SVG figure via data URL
     svg_b64 = base64.b64encode(svg_buffer.read()).decode("utf-8")
     plt.close(fig)
 
@@ -267,6 +270,7 @@ def time_download(filename):
     svg_buffer = render_svg(fig)
     plt.close(fig)
 
+    # AI-assisted: serving the in-memory SVG buffer as a file download via send_file()
     return send_file(svg_buffer, mimetype="image/svg+xml", as_attachment=True, download_name=f"{filename}_time.svg")
 
 
@@ -279,6 +283,7 @@ def freq(filename):
     plt.close(fig)
 
     settings = settings_load(path_settings(filename))
+
     return render_template("nmr/freq.html", figure=svg_b64, filename=filename, settings=settings)
 
 
@@ -531,5 +536,5 @@ def freq_download(filename):
     svg_buffer = render_svg(fig)
     plt.close(fig)
 
-    return send_file(svg_buffer, mimetype="image/svg+xml", as_attachment=True, download_name=f"{filename}_time.svg")
+    return send_file(svg_buffer, mimetype="image/svg+xml", as_attachment=True, download_name=f"{filename}_freq.svg")
 
