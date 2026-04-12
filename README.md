@@ -31,7 +31,7 @@ Click [here]().
 
 ## Installation
 
-```
+```bash
 git clone https://github.com/dmadot/project-flask.git
 cd project-flask
 python -m venv .venv
@@ -41,7 +41,7 @@ pip install -r requirements.txt
 
 ## Usage
 
-```
+```bash
 flask --app flaskr run
 ```
 
