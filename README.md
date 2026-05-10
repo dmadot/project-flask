@@ -14,7 +14,7 @@ PlotPie is experimental and under active development — features may change and
 
 ## Video Demo
 
-Click [here]().
+https://youtu.be/xcQHazMsXqg
 
 ## Features
 
