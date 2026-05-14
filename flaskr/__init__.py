@@ -1,14 +1,14 @@
+import logging
 import os
 from flask import Flask
 from . import about, auth, contact, learn, main, nmr, plot
-
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         ALLOWED_EXTENSIONS = {"zip"},
-        SECRET_KEY = "dev",
+        MAX_CONTENT_LENGTH = 50 * 1024 * 1024,
         UPLOAD_FOLDER = os.path.join(app.instance_path, "uploads"),
     )
 
@@ -20,8 +20,13 @@ def create_app(test_config=None):
         app.config.from_mapping(test_config)
 
     # ensure the instance folder exists
-
     os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+
+    # Diagnose issues in production.
+    logging.basicConfig(
+        filename=os.path.join(app.instance_path, "app.log"),
+        level=logging.ERROR
+    )
 
     app.register_blueprint(about.bp)
     app.register_blueprint(auth.bp)

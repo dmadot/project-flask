@@ -37,11 +37,6 @@ def build_fig_freq(filename):
     # Open a figure to create the plot.
     fig, ax = plt.subplots()
     ax.plot(ppm_scale, data, "k", lw=1)
-    ax.set_title(filename)
-    ax.set_xlabel("1H / ppm")
-    ax.set_xlim(settings["freq_axis"]["xmin"], settings["freq_axis"]["xmax"])
-    ax.set_ylim(settings["freq_axis"]["ymin"], settings["freq_axis"]["ymax"])
-    ax.invert_xaxis()
 
     # Plot the peaks.
     for peak in settings["freq_peaks"]:
@@ -69,6 +64,13 @@ def build_fig_freq(filename):
 
         ax.plot(i_scale, i_cumsum / 20 + i_data.max() + 0.5, "k", lw=1)
         ax.text(i_scale[0], i_cumsum[-1] / 20 + i_data.max() + 0.55, area)
+
+    # Plot settings
+    ax.set_title(filename)
+    ax.set_xlabel("1H / ppm")
+    ax.set_xlim(settings["freq_axis"]["xmin"], settings["freq_axis"]["xmax"])
+    ax.set_ylim(settings["freq_axis"]["ymin"], settings["freq_axis"]["ymax"])
+    ax.invert_xaxis()
   
     if settings["freq_threshold"]["bool"]:
         ax.hlines(settings["freq_threshold"]["value"], *uc.ppm_limits(), linestyle="--", color="k", lw=1)
@@ -187,6 +189,9 @@ def index():
         abort(400, "Path not found")
     else:
         items = os.listdir(path)
+        if ".timestamp.json" in items:
+            items.remove(".timestamp.json")
+
 
     return render_template("nmr/index.html", items=items)
 
@@ -195,39 +200,56 @@ def index():
 @session_required
 def uploads():
     file = request.files.get("file")
+    path = os.path.join(current_app.config["UPLOAD_FOLDER"], session.get("id"))
 
     if not file or file.filename == "":
-        return "No file", 400
+        return abort(400, "No file")
 
-    elif not allowed_file(file.filename):
-        return "File type not allowed", 400
+    if not allowed_file(file.filename):
+        return abort(400, "File type not allowed")
 
+    # Upload count limit 
+    items = os.listdir(path)
+    if ".timestamp.json" in items:
+        if len(items) >= 20:
+            return abort(400, "Too many uploads")
     else:
-        filename = Path(secure_filename(file.filename)).stem
-        
-        if not filename:
-            abort(400, "Invalid filename")
+        if len(items) >= 19:
+            return abort(400, "Too many uploads")
+    
+    # Check for valid filename
+    filename = Path(secure_filename(file.filename)).stem
+    if not filename:
+        abort(400, "Invalid filename")
 
-        path = os.path.join(current_app.config["UPLOAD_FOLDER"], session.get("id"))
-        file_path = os.path.join(path, filename)
-        os.makedirs(file_path)
+    # Create the file folder
+    file_path = os.path.join(path, filename)
+    if os.path.exists(file_path):
+        abort(400, "A file with this name already exists")
+    os.makedirs(file_path)
 
-        default_settings_path = os.path.join(current_app.root_path, "static", "default_settings.json")
+    # AI-assisted: hardening the ZIP upload to prevent path traversal attacks
+    if zipfile.is_zipfile(file):
+        with zipfile.ZipFile(file) as zf:
+            for member in zf.namelist():
+                member_path = os.path.realpath(os.path.join(file_path, member))
+                if not member_path.startswith(os.path.realpath(file_path) + os.sep):
+                    shutil.rmtree(file_path)
+                    return abort(400, "Invalid zip contents")
 
-        # Create the default settings for this dataset.
-        with open(file_path + f"/.settings.json", "w") as f:
-            json.dump(settings_load(default_settings_path), f)
+            total_size = sum(info.file_size for info in zf.infolist())
+            if total_size > 50 * 1024 * 1024:
+                shutil.rmtree(file_path)
+                return abort(400, "Zip contents too large")
 
-        # AI-assisted: hardening the ZIP upload to prevent path traversal attacks
-        if zipfile.is_zipfile(file):
-            with zipfile.ZipFile(file) as zf:
-                for member in zf.namelist():
-                    member_path = os.path.realpath(os.path.join(file_path, member))
-                    if not member_path.startswith(os.path.realpath(file_path) + os.sep):
-                        return "Invalid zip contents", 400
-                zf.extractall(os.path.join(file_path + "/.dataset"))
+            zf.extractall(os.path.join(file_path + "/.dataset"))
+    
+    # Create the default settings for this dataset.
+    default_settings_path = os.path.join(current_app.root_path, "static", "default_settings.json")
+    with open(file_path + f"/.settings.json", "w") as f:
+        json.dump(settings_load(default_settings_path), f)
 
-        return redirect(url_for("nmr.index"))
+    return redirect(url_for("nmr.index"))
 
 
 @bp.route("/uploads/<filename>/delete", methods=["POST"])
