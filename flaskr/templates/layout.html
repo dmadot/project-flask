@@ -1,36 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}{% endblock %} - PlotPie</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     </head>
-    <body>
-        <ul class="navbar">
-            <li><a href="{{ url_for('main.index') }}">PlotPie</a></li>
-            <li><a href="{{ url_for('about.index') }}">About</a></li>
-            <li><a href="{{ url_for('learn.index') }}">Learn</a></li>
-            <li><a href="{{ url_for('nmr.index') }}">NMR</a></li>
-            <li><a href="{{ url_for('plot.index') }}">Plot</a></li>
-            <li>
-                {% if g.user %}
-                    <form action="{{ url_for('auth.close_session', next=request.path) }}" method="post">
-                        <button type="submit">Close session</button>
-                    </form>
-                {% elif not g.user %}
-                    <form action="{{ url_for('auth.open_session', next=request.path) }}" method="post">
-                        <button type="submit">Open session</button>
-                    </form>
-                {% endif %}
-            </li>
-        </ul>
-
-        <main class="main-layout">
+    <body class="d-flex flex-column min-vh-100">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+            <div class="container">
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">PlotPie</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'about.index' %}active{% endif %}" href="{{ url_for('about.index') }}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'learn.index' %}active{% endif %}" href="{{ url_for('learn.index') }}">Learn</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'nmr.index' %}active{% endif %}" href="{{ url_for('nmr.index') }}">NMR</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.endpoint == 'plot.index' %}active{% endif %}" href="{{ url_for('plot.index') }}">Plot</a>
+                        </li>
+                    </ul>
+                    {% if g.user %}
+                        <form class="d-flex" action="{{ url_for('auth.close_session', next=request.path) }}" method="post">
+                            <button class="btn btn-primary" type="submit">Close session</button>
+                        </form>
+                    {% elif not g.user %}
+                        <form class="d-flex" action="{{ url_for('auth.open_session', next=request.path) }}" method="post">
+                            <button class="btn btn-primary" type="submit">Open session</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+        <main class="container flex-grow-1 mt-4">
             {% block body %}{% endblock %}
         </main>
-
-        <footer>
-            <center>&#169 Dimitri Karpov</center>
+        <footer class="text-center mt-4 py-3 text-muted">
+            &copy; Dimitri Karpov
         </footer>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     </body>
 </html>

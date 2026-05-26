@@ -65,6 +65,17 @@ def build_fig_freq(filename):
         ax.plot(i_scale, i_cumsum / 20 + i_data.max() + 0.5, "k", lw=1)
         ax.text(i_scale[0], i_cumsum[-1] / 20 + i_data.max() + 0.55, area)
 
+    # Set default axis
+    axis = settings["freq_axis"]
+    if axis["xmin"] == None:
+        axis["xmin"] = ppm_scale.min()
+    if axis["xmax"] == None:
+        axis["xmax"] = ppm_scale.max()
+    if axis["ymin"] == None:
+        axis["ymin"] = -0.1
+    if axis["ymax"] == None:
+        axis["ymax"] = 3
+
     # Plot settings
     ax.set_title(filename)
     ax.set_xlabel("1H / ppm")
@@ -74,6 +85,11 @@ def build_fig_freq(filename):
   
     if settings["freq_threshold"]["bool"]:
         ax.hlines(settings["freq_threshold"]["value"], *uc.ppm_limits(), linestyle="--", color="k", lw=1)
+
+    # Update settings
+    settings["freq_axis"] = axis
+    with open(path, "w") as p:
+        json.dump(settings, p, indent=4)
 
     return fig
 
@@ -192,8 +208,13 @@ def index():
         if ".timestamp.json" in items:
             items.remove(".timestamp.json")
 
-
-    return render_template("nmr/index.html", items=items)
+    # Load default setting
+    default_settings_path = os.path.join(current_app.root_path, "static", "default_settings.json")
+    settings = settings_load(default_settings_path)
+    if not settings:
+        abort(400, "Default settings could not be loaded")
+    
+    return render_template("nmr/index.html", items=items, settings=settings)
 
 
 @bp.route("/uploads", methods=["POST"])
@@ -299,6 +320,14 @@ def time_download(filename):
 @bp.route("/freq/<filename>")
 @session_required
 def freq(filename):
+    path = os.path.join(current_app.config["UPLOAD_FOLDER"], session.get("id"))
+    if not os.path.isdir(path):
+        abort(400, "Path not found")
+    else:
+        items = os.listdir(path)
+        if ".timestamp.json" in items:
+            items.remove(".timestamp.json")
+
     fig = build_fig_freq(filename)
     svg_buffer = render_svg(fig)
     svg_b64 = base64.b64encode(svg_buffer.read()).decode("utf-8")
@@ -306,7 +335,7 @@ def freq(filename):
 
     settings = settings_load(path_settings(filename))
 
-    return render_template("nmr/freq.html", figure=svg_b64, filename=filename, settings=settings)
+    return render_template("nmr/index.html", figure=svg_b64, filename=filename, items=items, settings=settings)
 
 
 @bp.route("/freq/<filename>/axis", methods=["POST"])
@@ -378,7 +407,7 @@ def freq_peak_delete(filename):
             temp_peaks.remove(peak)
             break 
 
-    # Distribute new peak_is's
+    # Distribute new peak_id's
     for n, peak in enumerate(temp_peaks, start=1):
         peak["id"] = n
 
@@ -406,6 +435,80 @@ def freq_threshold(filename):
 
     return redirect(url_for("nmr.freq", filename=filename))
 
+
+@bp.route("freq/<filename>/peak/action", methods=["POST"])
+@session_required
+def freq_peaks_action(filename):
+    # Load the settings
+    path = path_settings(filename)
+    settings = settings_load(path)
+
+    # Valid actions for validation of users input
+    valid_actions = ["remove", "reset", "zoom"]
+
+    # Users input
+    action = request.form.get("action")
+    selectet_peaks = request.form.getlist("peaks")
+
+    # Convert the peak list into integer & check for valid input
+    for n, peak in enumerate(selectet_peaks):
+        try:
+            selectet_peaks[n] = int(peak)
+        except(ValueError, TypeError):
+            abort(400, "Invalid ID")
+
+    # Check for valid action input
+    if action not in valid_actions:
+        abort(400, "Action not allowed")
+
+    # Check if the peaks are in the peaklist
+    for peak in selectet_peaks:
+        if peak not in [peak["id"] for peak in settings["freq_peaks"]]:
+            abort(400, "Invalid id")
+
+    # Reset peaks
+    if action == "reset":
+        settings["freq_peaks"] = []
+        with open(path, "w") as f:
+            json.dump(settings, f, indent=4)
+
+    # Delete peaks
+    elif action == "remove":
+
+        # Copy the settings for editing
+        temp_peaks = settings["freq_peaks"].copy() 
+
+        # Remove all peaks the user are selectet
+        for peak in settings["freq_peaks"]:
+            if peak["id"] in selectet_peaks:
+                temp_peaks.remove(peak)
+
+        # Distribute new peak_id's
+        for n, peak in enumerate(temp_peaks, start=1):
+            peak["id"] = n
+
+        # Update the settings
+        settings["freq_peaks"] = temp_peaks
+        with open(path, "w") as f:
+            json.dump(settings, f, indent=4)
+
+    # Zoom
+    else:
+        if len(selectet_peaks) > 1:
+            abort(400, "Just one peak are allowed")
+        else:
+            for peak in settings["freq_peaks"]:
+                if peak["id"] in selectet_peaks:
+                    settings["freq_axis"]["xmin"] = peak["ppm"] - 0.1
+                    settings["freq_axis"]["xmax"] = peak["ppm"] + 0.1
+                    break
+
+            # Update the settings
+            with open(path, "w") as f:
+                json.dump(settings, f, indent=4)
+
+
+    return redirect(url_for("nmr.freq", filename=filename))
 
 @bp.route("freq/<filename>/peaks/reset", methods=["POST"])
 @session_required
@@ -476,6 +579,9 @@ def freq_integrals(filename):
 
     data, ppm_scale, uc = load_freq_domain(path_dataset(filename), p0, p1)
 
+    if start > end:
+        start, end = end, start
+
     i0 = uc(start, "ppm")
     i1 = uc(end, "ppm")
 
@@ -497,6 +603,66 @@ def freq_integrals(filename):
 
     with open(path, "w") as f:
         json.dump(settings, f, indent=4)
+
+    return redirect(url_for("nmr.freq", filename=filename))
+
+@bp.route("freq/<filename>/integrals/action", methods=["POST"])
+@session_required
+def freq_integrals_action(filename):
+    path = path_settings(filename)
+    settings = settings_load(path)
+    
+    # Get the users action input & validation
+    valid_actions = ["remove", "reset", "zoom"]
+    action = request.form.get("action")
+    if action not in valid_actions:
+        abort(400, "Invalid action")
+
+    # Get and validate the integral id
+    selectet_integrals = request.form.getlist("integrals")
+    if len(selectet_integrals) > 0:
+        check_id = []
+        for n, i in enumerate(selectet_integrals):
+            selectet_integrals[n] = int(i)
+        for i in settings["freq_integrals"]:
+            check_id.append(i["id"])
+        for i in selectet_integrals:
+            if i not in check_id:
+                abort(400, "Invalid id")
+
+    # Remove integrals
+    if action == "remove":
+        temp_list = settings["freq_integrals"].copy()
+        for i in settings["freq_integrals"]:
+            if i["id"] in selectet_integrals:
+                temp_list.remove(i)
+        
+        # Resort the list & re-enumerate the list
+        sorted_integrals = sorted(temp_list, key=lambda x: x["start"], reverse=True)
+        for n, i in enumerate(sorted_integrals, start=1):
+            i["id"] = n
+
+        # Update the settings
+        settings["freq_integrals"] = sorted_integrals
+    
+    # Reset integrals
+    elif action == "reset":
+        settings["freq_integrals"] = []
+
+    # Zoom in
+    # TODO Check system to set min, max korrekt (12 <- 0 ppm)
+    else:
+        if len(selectet_integrals) != 1:
+            abort(400, "Select one integral to zoom in")
+        else:
+            for i in settings["freq_integrals"]:
+                if i["id"] in selectet_integrals:
+                    settings["freq_axis"]["xmin"] = i["start"] - 0.1
+                    settings["freq_axis"]["xmax"] = i["end"] + 0.1
+                    
+    # Save the settings
+    with open(path, "w") as p:
+        json.dump(settings, p, indent=4)
 
     return redirect(url_for("nmr.freq", filename=filename))
 
@@ -560,3 +726,81 @@ def freq_download(filename):
 
     return send_file(svg_buffer, mimetype="image/svg+xml", as_attachment=True, download_name=f"{filename}_freq.svg")
 
+
+@bp.route("freq/<filename>/integral/navigate", methods=["POST"])
+@session_required
+def navigate(filename):
+
+    # Set the allowed movements the user can select
+    allowed_navigation = [
+        "x_out",
+        "up",
+        "x_in",
+        "left",
+        "center",
+        "right",
+        "y_out",
+        "down",
+        "y_in"
+    ]
+
+    # Zoom & movement settings
+
+    # Get & validate the user Input
+    path = path_settings(filename)
+    settings = settings_load(path)
+    move = request.form.get("navigate")
+    if move not in allowed_navigation:
+        abort(400, "Input not allowed")
+
+    try:
+        move_index = float(request.form.get("move_index"))
+        zoom_index = float(request.form.get("zoom_index"))
+    except(ValueError, TypeError):
+        abort(400, "Invalid Index")
+
+    # Get the old axis
+    axis = settings["freq_axis"]
+    x_range = axis["xmax"] - axis["xmin"]
+    y_range = axis["ymax"] - axis["ymin"]
+
+    # Get the new axis
+    # TODO: Bug left & right get oposit and y zoom baseline fix
+    if move == "x_out":
+        axis["xmin"] -= x_range * zoom_index
+        axis["xmax"] += x_range * zoom_index
+    elif move == "up":
+        axis["ymin"] -= y_range * move_index
+        axis["ymax"] -= y_range * move_index
+    elif move == "x_in":
+        axis["xmin"] += x_range * zoom_index
+        axis["xmax"] -= x_range * zoom_index
+    elif move == "left":
+        axis["xmin"] -= x_range * move_index
+        axis["xmax"] -= x_range * move_index
+    elif move == "center":
+        axis["xmin"], axis["xmax"], axis["ymin"], axis["ymax"] = None, None, None, None
+    elif move == "right":
+        axis["xmin"] += x_range * move_index
+        axis["xmax"] += x_range * move_index
+    elif move == "y_out":
+        ymax = axis["ymax"]
+        axis["ymin"] = 0 - ((ymax * (1 - zoom_index)) * 0.05)
+        axis["ymax"] = ymax * (1 - zoom_index)
+    elif move == "down":
+        axis["ymin"] += y_range * move_index
+        axis["ymax"] += y_range * move_index
+    elif move == "y_in":
+        ymax = axis["ymax"]
+        axis["ymin"] = 0 - ((ymax * (1 + zoom_index)) * 0.05)
+        axis["ymax"] = ymax * (1 + zoom_index)
+
+    # Update the settings
+    settings["freq_axis"] = axis
+    settings["freq_navigation"]["move_index"] = move_index
+    settings["freq_navigation"]["zoom_index"] = zoom_index
+    with open(path, "w") as p:
+        json.dump(settings, p, indent=4)
+
+    # Redirect to main
+    return redirect(url_for("nmr.freq", filename=filename))

@@ -5,47 +5,248 @@
 
 {% block body %}
 
-    <h1>Upload</h1>
-    <form action="{{ url_for('nmr.uploads') }}" method="post" enctype="multipart/form-data">
-        <input type="file" name="file">
-        <button class="button" type="submit">
-            <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 15C3 17.8284 3 19.2426 3.87868 20.1213C4.75736 21 6.17157 21 9 21H15C17.8284 21 19.2426 21 20.1213 20.1213C21 19.2426 21 17.8284 21 15" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M12 16V3M12 3L16 7.375M12 3L8 7.375" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-        </button>
-    </form>
+    <div class="row">
 
-    <h1>Data</h1>
-    <table>
-        {% for item in items %}
-            <tr>
-                <td>{{ item }}</td>
-                <td>
-                    <form action="{{ url_for('nmr.time', filename=item) }}" method="get">
-                        <button class="button" type="submit">
-                            <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M2 12H9.5M22 12H14.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                                <path d="M20.0002 15.6843C20.0002 19 17.7345 22 16.0002 22C14.7427 22 13.6725 21.0299 12.9682 18.9999M4.14404 8.31567C4.14404 4.99988 6.40978 1.99988 8.14404 1.99988C10.4128 1.99988 12.0723 5.15794 12.0723 12C12.0723 13.0933 12.1146 14.0926 12.1951 14.9999" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                            </svg>
-                        </button>
-                    </form>                    
-                </td>
-                <td>
-                    <form action="{{ url_for('nmr.delete', filename=item) }}" method="post">
-                        <button class="button" type="submit">
-                            <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M20.5001 6H3.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                                <path d="M9.5 11L10 16" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                                <path d="M14.5 11L14 16" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                                <path d="M6.5 6C6.55588 6 6.58382 6 6.60915 5.99936C7.43259 5.97849 8.15902 5.45491 8.43922 4.68032C8.44784 4.65649 8.45667 4.62999 8.47434 4.57697L8.57143 4.28571C8.65431 4.03708 8.69575 3.91276 8.75071 3.8072C8.97001 3.38607 9.37574 3.09364 9.84461 3.01877C9.96213 3 10.0932 3 10.3553 3H13.6447C13.9068 3 14.0379 3 14.1554 3.01877C14.6243 3.09364 15.03 3.38607 15.2493 3.8072C15.3043 3.91276 15.3457 4.03708 15.4286 4.28571L15.5257 4.57697C15.5433 4.62992 15.5522 4.65651 15.5608 4.68032C15.841 5.45491 16.5674 5.97849 17.3909 5.99936C17.4162 6 17.4441 6 17.5 6" stroke="#1C274C" stroke-width="1.5"/>
-                                <path d="M18.3735 15.3991C18.1965 18.054 18.108 19.3815 17.243 20.1907C16.378 21 15.0476 21 12.3868 21H11.6134C8.9526 21 7.6222 21 6.75719 20.1907C5.89218 19.3815 5.80368 18.054 5.62669 15.3991L5.16675 8.5M18.8334 8.5L18.6334 11.5" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
-                            </svg>
-                        </button>
+        <!-- Browser (uploads) -->
+        <div class="col-12 col-lg-2">
+
+            <!-- Upload -->
+            <form action="{{ url_for('nmr.uploads') }}" class="p-1" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label" for="file">Upload dataset</label>
+                    <input class="form-control" id="file" name="file" type="file">
+                </div>
+                <button class="btn btn-primary" type="submit">Upload</button>
+            </form>
+
+            <!-- Delete -->
+            <form action="{{ url_for('nmr.delete', filename=filename) }}" class="p-1" method="post">
+                <button class="btn btn-primary">Delete</button>
+            </form>
+
+            <!-- Download -->
+            <form action="{{ url_for('nmr.freq_download', filename=filename) }}" class="p-1" method="post">
+                <button class="btn btn-primary">Download</button>
+            </form>
+
+            <!-- List of the data -->
+            <div class="list-group mt-4 p-1">
+                {% for item in items %}
+                    <a class="list-group-item list-group-item-action" href="{{ url_for('nmr.freq', filename=item) }}">{{ item }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Main (Plot) -->
+        <div class="col-12 col-lg-6">
+            <div class="row">
+                <div class="col-12">
+                    <figure class="border d-flex figure rounded">
+                        <img alt="Frequence domain NMR" class="figure-img img-fluid rounded" width="100%" height="auto" src="data:image/svg+xml;base64,{{ figure }}">
+                    </figure>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="col-12 col-lg-2">
+
+            <!-- Navigation with buttons -->
+            <form action="{{ url_for('nmr.navigate', filename=filename) }}" class="border p-2 rounded row" method="post">
+                <div class="col-6 p-1">
+                    <label class="form-label">zoom</label>
+                    <input class="form-control form-control-sm" name="zoom_index" step="any" type="number" value="{{ settings['freq_navigation']['zoom_index'] }}">
+                </div>
+                <div class="col-6 p-1">
+                    <label class="form-label">move</label>
+                    <input class="form-control form-control-sm" name="move_index" step="any" type="number" value="{{ settings['freq_navigation']['move_index'] }}">
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="x_out">x-out</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="up">up</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="x_in">x-in</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="left">left</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="center">center</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="right">right</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="y_out">y-out</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="down">down</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="y_in">y-in</button>
+                </div>
+            </form>
+            
+            <!-- Axis control -->
+            <form action="{{ url_for('nmr.freq_axis', filename=filename) }}" class="border mt-3 p-2 rounded row" method="post">
+                <label class="col-12 form-label">Axis adjustment</label>
+                <div class="col-6">
+                    <label class="form-label">x-min</label>
+                    <input class="form-control form-control-sm" name="xmin" step="any" type="number" value="{{ settings['freq_axis']['xmin'] }}">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">x-max</label>
+                    <input class="form-control form-control-sm" name="xmax" step="any" type="number" value="{{ settings['freq_axis']['xmax'] }}">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">y-min</label>
+                    <input class="form-control form-control-sm" name="ymin" step="any" type="number" value="{{ settings['freq_axis']['ymin'] }}">
+                </div>
+                <div class="col-6">
+                    <label class="form-label">y-max</label>
+                    <input class="form-control form-control-sm" name="ymax" step="any" type="number" value="{{ settings['freq_axis']['ymax'] }}">
+                </div>
+                <input type="submit" hidden>
+            </form>
+
+            <!-- Form for phasekorektion -->
+             <form action="{{ url_for('nmr.freq_phase', filename=filename) }}" class="border mt-3 p-2 rounded row" method="post">
+                <label class="col-12 form-label">Phasekorektion</label>
+                <div class="col-6">
+                    <label class="form-label" for="p0">p0</label>
+                    <input class="form-control form-control-sm" id="p0" name="p0" step="any" type="number" value="{{ settings['freq_phase']['p0'] }}">
+                </div>
+                <div class="col-6">
+                    <label class="form-label" for="p1">p1</label>
+                    <input class="form-control form-control-sm" id="p1" name="p1" step="any" type="number" value="{{ settings['freq_phase'][p1] }}">
+                </div>
+                <input type="submit" hidden>
+             </form>
+
+            <!-- Form for Integrals -->
+            <form action="{{ url_for('nmr.freq_integrals', filename=filename) }}" class="border mt-3 p-2 rounded row" method="post">
+                <label class="col-12 form-label">Integrals</label>
+                <div class="col-6">
+                    <label class="form-label" for="start">start</label>
+                    <input class="form-control form-control-sm" id="start" name="start" step="any" type="number">
+                </div>
+                <div class="col-6">
+                    <label class="form-label" for="end">end</label>
+                    <input class="form-control form-control-sm" id="end" name="end" step="any" type="number">
+                </div>
+                <input type="submit" hidden>
+            </form>
+
+            <!-- Form for auto peak peaking -->
+            <div class="border mt-3 p-2 rounded row">
+                <label class="col-12 form-label" for="threshold">Threshold</label>
+                <form action="{{ url_for('nmr.freq_peaks', filename=filename) }}" class="col-6" method="post">
+                    <input class="form-control form-control-sm" id="threshold" name="threshold" step="any" type="number" value="{{ settings['freq_threshold']['value'] }}">
+                    <input type="submit" hidden>
+                </form>
+                {% if settings['freq_threshold']['bool'] %}
+                    <form action="{{ url_for('nmr.freq_threshold', filename=filename) }}" class="col-6" method="post">
+                        <button class="btn btn-primary btn-sm" type="submit">Hide</button>
                     </form>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+                {% else %}
+                    <form action="{{ url_for('nmr.freq_threshold', filename=filename) }}" class="col-6" method="post">
+                        <button class="btn btn-primary btn-sm">Show</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Form for the peak and integral list -->
+        <div class="col-12 col-lg-2 ps-4">
+
+            <!-- Peaklist -->
+            <form action="{{ url_for('nmr.freq_peaks_action', filename=filename) }}" class="border p-2 rounded row" method="post">
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm" name="action" value="reset" type="submit">rs</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm" name="action" value="remove" type="submit">rm</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm" name="action" value="zoom" type="submit">zm</button>
+                </div>
+                <div class="col-12" style="height: 35vh; overflow-y: auto; overflow-x: hidden;">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th style="position: sticky;"></th>
+                                <th style="position: sticky;">#</th>
+                                <th style="position: sticky;">ppm</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for peak in settings["freq_peaks"] %}
+                                <tr>
+                                    <td><input class="form-check-input" type="checkbox" name="peaks" value="{{ peak['id'] }}"></td>
+                                    <td>{{ peak["id"] }}</td>
+                                    <td>{{ peak["ppm"]|round(2) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <!--
+                    <select class="border border-0 col-12 form-select p-2 rounded" multiple name="peaks" id="peaks" style="height: 40vh;">
+                        {% for peak in settings["freq_peaks"] %}
+                            <option value="{{ peak['id'] }}">{{ peak["ppm"]|round(2) }}</option>
+                        {% endfor %}
+                    </select>
+                    -->
+                </div>
+            </form>
+
+            <!-- Integrallist -->
+            <form action="{{ url_for('nmr.freq_integrals_action', filename=filename) }}" class="border p-2 mt-3 rounded row" method="post">
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm" name="action" value="reset" type="submit">rs</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm" name="action" value="remove" type="submit">rm</button>
+                </div>
+                <div class="col-4 p-1">
+                    <button class="btn btn-primary btn-sm" name="action" value="zoom" type="submit">zm</button>
+                </div>
+                <div class="col-12" style="height: 35vh; overflow-y: auto; overflow-x: hidden;">
+                    <table class="table table-hover table-sm">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th style="position: sticky;">#</th>
+                                <th style="position: sticky;">start</th>
+                                <th style="position: sticky;">end</th>
+                                <th style="position: sticky;">area</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for integral in settings["freq_integrals"] %}
+                                <tr>
+                                    <td><input class="form-check-input" type="checkbox" name="integrals" value="{{ integral['id'] }}"></td>
+                                    <td>{{ integral["id"] }}</td>
+                                    <td>{{ integral["start"] }}</td>
+                                    <td>{{ integral["end"] }}</td>
+                                    <td>{{ integral["area"]|round(2) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+
+            <!--
+                <select class="border col-12 form-select mt-3 p-2 rounded" multiple name="integral" id="integral" style="height: 40vh;">
+                    {% for integral in settings["freq_integrals"] %}
+                    <option value=integral["id"]>{{ integral["area"]|round(2) }}</option>
+                    {% endfor %}
+                </select>
+            -->
+        </div>
+    </div>
 
 {% endblock %}

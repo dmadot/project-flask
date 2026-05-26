@@ -5,9 +5,22 @@
 
 {% block body %}
 
-    <h1>PlotPie</h1>
-    <p>Process and visualize NMR spectra in the browser — no software to install, no data stored.</p>
-    <p>Upload a Bruker dataset and export your spectrum as SVG in seconds.</p>
-    <p><a href="{{ url_for('nmr.index') }}">Get started</a> or <a href="{{ url_for('about.index') }}">learn more</a>.</p>
+    <div class="row">
+        <div class="col-12 col-lg-2 d-none d-lg-block">
+            <!-- Placeholder -->
+        </div>
+        <div class="col-12 col-lg-8 text-center">
+            <p class="display-6 fw-bold">Process and visualize NMR spectra in the browser for free</p>
+            <p class="lead mt-4">Upload a Bruker dataset and export your spectrum as SVG</p>
+            <p class="lead">No software to install, No data stored</p>
+            <div class="mt-4">
+                <a class="btn btn-outline-secondary" href="{{ url_for('nmr.index') }}">Get started</a>
+                <a class="btn btn-outline-secondary ms-2" href="{{ url_for('about.index') }}">Learn more</a>
+            </div>
+        </div>
+        <div class="col-12 col-lg-2 d-none d-lg-block">
+            <!-- Placeholder -->
+        </div>
+    </div>
 
 {% endblock %}

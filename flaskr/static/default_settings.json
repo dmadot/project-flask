@@ -11,6 +11,10 @@
         "ymin": null,
         "ymax": null
     },
+    "freq_navigation": {
+        "move_index": 0.25,
+        "zoom_index": 0.25
+    },
     "freq_phase": {
         "p0": 0,
         "p1": 0

@@ -5,22 +5,33 @@
 
 {% block body %}
 
-    <h1>About PlotPie</h1>
-    <p>PlotPie is a free tool for processing and visualizing scientific spectral data directly in the browser. The current version focuses on NMR spectra, where users can upload a Bruker dataset, process it, and export the spectrum as SVG.</p>
-    <p>PlotPie is built with Python, using nmrglue for spectral data processing and matplotlib for visualization. The web interface is implemented with Flask and plain HTML forms.</p>
+    <div class="row">
+        <div class="col-12 col-lg-2 d-none d-lg-block">
+            <!-- Placeholder -->
+        </div>
+        <div class="col-12 col-lg-8">
+            <h1>About PlotPie</h1>
+            <p>PlotPie is a free tool for processing and visualizing scientific spectral data directly in the browser. The current version focuses on NMR spectra, where users can upload a Bruker dataset, process it, and export the spectrum as SVG.</p>
+            <p>PlotPie is built with Python, using nmrglue for spectral data processing and matplotlib for visualization. The web interface is implemented with Flask and plain HTML forms.</p>
 
-    <h2>Motivation</h2>
-    <p>NMR analysis tools are often expensive, bloated, and heavy. PlotPie was born out of a lack of good, free, web-based alternatives and a desire to build one from scratch.</p>
+            <h2>Motivation</h2>
+            <p>NMR analysis tools are often expensive, bloated, and heavy. PlotPie was born out of a lack of good, free, web-based alternatives and a desire to build one from scratch.</p>
 
-    <h2>Project Status</h2>
-    <p>PlotPie is experimental and under active development — features may change and additional spectroscopic methods may be added over time.</p>
+            <h2>Project Status</h2>
+            <p>PlotPie is experimental and under active development — features may change and additional spectroscopic methods may be added over time.</p>
 
-    <h2>Data Handling</h2>
-    <p>Uploaded files are used only for processing and visualization within the current session. No user data is stored long-term.</p>
+            <h2>Data Handling</h2>
+            <p>Uploaded files are used only for processing and visualization within the current session. No user data is stored long-term.</p>
 
-    <h2>About the Developer</h2>
-    <p>PlotPie is developed as a personal project by an analytical chemist with an interest in scientific computing. The project started as a way to combine chemistry knowledge and programming skills, with the goal of building practical tools for processing and presenting experimental data.</p>
-    <p><a href="https://github.com/dmadot/project-flask">github.com/dmadot/project-flask</a></p>
-    <p><a href="{{ url_for('nmr.index') }}">Get started</a> or <a href="{{ url_for('learn.index') }}">learn how to use</a>.</p>
+            <h2>About the Developer</h2>
+            <p>PlotPie is developed as a personal project by an analytical chemist with an interest in scientific computing. The project started as a way to combine chemistry knowledge and programming skills, with the goal of building practical tools for processing and presenting experimental data.</p>
+            <p><a href="https://github.com/dmadot/project-flask">github.com/dmadot/project-flask</a></p>
+            <p><a href="{{ url_for('nmr.index') }}">Get started</a> or <a href="{{ url_for('learn.index') }}">learn how to use</a>.</p>
+        </div>
+        <div class="col-12 col-lg-2 d-none d-lg-block">
+            <!-- Placeholder -->
+        </div>
+    </div>
+
 
 {% endblock %}
