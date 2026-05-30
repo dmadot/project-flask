@@ -3,13 +3,42 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}{% endblock %} - PlotPie</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+        <!-- Title & Description -->
+        <meta name="description" 
+              content="Free, browser-based NMR processing. 
+              Upload a Bruker dataset, apply phase correction, detect peaks, 
+              integrate, and export as SVG. No installation, no data stored.">
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='figures/cake2-fill.png') }}">
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://plotpie.dev/">
+        <meta property="og:title" content="PlotPie — Process NMR spectra in your browser">
+        <meta property="og:description" content="Free, browser-based NMR processing. Upload a Bruker dataset and export your spectrum as SVG.">
+        <meta property="og:image" content="https://plotpie.dev/static/figures/furfurylamine_freq(1).png">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:site_name" content="PlotPie">
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="PlotPie — Process NMR spectra in your browser">
+        <meta name="twitter:description" content="Free, browser-based NMR processing.">
+        <meta name="twitter:image" content="https://plotpie.dev/static/figures/furfurylamine_freq(1).png">
+
+        <!-- Canonical URL -->
+        <link rel="canonical" href="https://plotpie.dev/">
+
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.min.css') }}">
     </head>
     <body class="d-flex flex-column min-vh-100">
         <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
             <div class="container">
-                <a class="navbar-brand" href="{{ url_for('main.index') }}">PlotPie</a>
+                <a class="navbar-brand" href="{{ url_for('main.index') }}"><i class="bi bi-cake2-fill"></i> PlotPie</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -45,16 +74,18 @@
         </main>
         <footer class="text-center text-muted small mt-5 pt-4 border-top">
             <p class="mb-1">
-                Built with open-source software · <a href="https://github.com/dmadot/project-flask/blob/master/THIRD_PARTY_LICENSES.md" class="text-muted">Third-party licenses</a>
+                Built with open-source software · 
+                <a href="https://github.com/dmadot/project-flask/blob/master/THIRD_PARTY_LICENSES.md" class="text-muted">Third-party licenses</a>
             </p>
             <p class="mb-1">
-                v0.1.0 · Last updated May 2026 · MIT licensed
+                Last updated May 2026 ·
                 <a href="https://github.com/dmadot/project-flask/blob/master/LICENSE" class="text-muted">MIT licensed</a>
             </p>
             <p class="mb-0">
-                <a href="https://github.com/dmadot/project-flask" class="text-muted">Source on GitHub</a> · © Dimitri Karpov
+                © Dimitri Karpov · 
+                <a href="https://github.com/dmadot/project-flask" class="text-muted">Source on GitHub</a>
             </p>
         </footer>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+        <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     </body>
 </html>

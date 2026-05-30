@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 
-{% block title %}Learn{% endblock %}
+{% block title %}Learn — PlotPie{% endblock %}
 
 {% block body %}
 
@@ -12,15 +12,12 @@
                 <a class="list-group-item list-group-item-action" href="#list-item-2">Session</a>
                 <a class="list-group-item list-group-item-action" href="#list-item-3">Upload</a>
                 <a class="list-group-item list-group-item-action" href="#list-item-4">File Naming</a>
-                <a class="list-group-item list-group-item-action" href="#list-item-5">Processing</a>
-                <a class="list-group-item list-group-item-action" href="#list-item-6">Downloading</a>
                 <a class="list-group-item list-group-item-action" href="#list-item-7">Apply Changes</a>
                 <a class="list-group-item list-group-item-action" href="#list-item-8">Phase Correction</a>
                 <a class="list-group-item list-group-item-action" href="#list-item-9">Axis</a>
                 <a class="list-group-item list-group-item-action" href="#list-item-10">Peak Detection</a>
-                <a class="list-group-item list-group-item-action" href="#list-item-11">Peak List</a>
                 <a class="list-group-item list-group-item-action" href="#list-item-12">Integration</a>
-                <a class="list-group-item list-group-item-action" href="#list-item-13">Integral List</a>
+                <a class="list-group-item list-group-item-action" href="#list-item-13">Peak & Integral List</a>
             </div>
         </div>
         <div class="col-12 col-lg-8 ps-5 pe-5">
@@ -37,41 +34,35 @@
                 </p>
 
                 <h2 id="list-item-3">Upload</h2>
-                <ul>
-                    <li>Only Bruker datasets are supported</li>
-                    <li>Only 1H-NMR datasets are supported</li>
-                    <li>The dataset must be uploaded as a ZIP archive</li>
-                    <li>The ZIP file should contain the original Bruker folder structure</li>
+                <ul class="list-group">
+                    <li class="list-group-item">Only Bruker datasets are supported</li>
+                    <li class="list-group-item">Only 1H-NMR datasets are supported</li>
+                    <li class="list-group-item">The dataset must be uploaded as a ZIP archive</li>
+                    <li class="list-group-item">The ZIP file should contain the original Bruker folder structure</li>
                 </ul>
                 <p>The uploaded archive is automatically extracted by the application.</p>
 
                 <h3 id="list-item-4">File Naming</h3>
                 <p>Please use simple file names without spaces or special characters, as these may cause issues during processing. Recommended format:</p>
-                <ul>
-                    <li>butyl_phenyl_ether.zip</li>
-                    <li>sample_1.zip</li>
+                <ul class="list-group">
+                    <li class="list-group-item">butyl_phenyl_ether.zip</li>
+                    <li class="list-group-item">sample_1.zip</li>
                 </ul>
                 <p>Avoid names such as:</p>
-                <ul>
-                    <li>butyl phenyl ether.zip</li>
-                    <li>butyl-phenyl-ether (final).zip</li>
-                    <li>sample#1.zip</li>
+                <ul class="list-group">
+                    <li class="list-group-item">butyl phenyl ether.zip</li>
+                    <li class="list-group-item">butyl-phenyl-ether (final).zip</li>
+                    <li class="list-group-item">sample#1.zip</li>
                 </ul>
-
-                <h2 id="list-item-5">Processing</h2>
-                <p>Select your file by clicking the <strong>plot</strong> icon to view the raw FID. You can zoom in by adjusting the axis fields and download the figure as SVG. Click the <strong>plot</strong> icon again to view the frequency-domain spectrum.</p>
-
-                <h2 id="list-item-6">Downloading</h2>
-                <p>To download the FID or the final spectrum, click the <strong>download</strong> icon.</p>
 
                 <h2 id="list-item-7">Apply Changes</h2>
                 <p>To submit the form (e.g. when changing the axis range), press <strong>Enter</strong>.</p>
 
                 <h2 id="list-item-8">Phase Correction</h2>
                 <p>After the FFT, the spectrum may appear distorted. Use the phase correction controls to fix this:</p>
-                <ul>
-                    <li><strong>P0</strong> — zero-order phase correction: applies a constant phase shift across the whole spectrum</li>
-                    <li><strong>P1</strong> — first-order phase correction: applies a phase shift that varies linearly across the spectrum</li>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>P0</strong> — zero-order phase correction: applies a constant phase shift across the whole spectrum</li>
+                    <li class="list-group-item"><strong>P1</strong> — first-order phase correction: applies a phase shift that varies linearly across the spectrum</li>
                 </ul>
                 <p>Adjust P0 and P1 until the peaks appear symmetric and upright (pure absorption mode).</p>
 
@@ -80,31 +71,24 @@
 
                 <h2 id="list-item-10">Peak Detection</h2>
                 <p>PlotPie can automatically detect peaks in the spectrum.</p>
-                <ul>
-                    <li><strong>Threshold</strong> — sets the minimum intensity required for peak detection</li>
-                    <li><strong>Eye</strong> — toggles the threshold line on the plot</li>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Threshold</strong> — sets the minimum intensity required for peak detection</li>
+                    <li class="list-group-item"><strong>Eye</strong> — toggles the threshold line on the plot</li>
                 </ul>
                 <p>Adjust the threshold to filter out noise and focus on real peaks.</p>
 
-                <h2 id="list-item-11">Peak List</h2>
-                <p>Shows all peaks detected by the algorithm.</p>
-                <ul>
-                    <li>Zoom in by clicking the <strong>zoom</strong> icon</li>
-                    <li>Remove an peak by clicking the <strong>trashcan</strong> icon</li>
-                    <li>Reset the entire list by clicking the <strong>circle</strong> icon</li>
-                </ul>
-
                 <h2 id="list-item-12">Integration</h2>
-                <ul>
-                    <li><strong>Start</strong> — the left boundary of the integration region</li>
-                    <li><strong>End</strong> — the right boundary of the integration region</li>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Start</strong> — the left boundary of the integration region</li>
+                    <li class="list-group-item"><strong>End</strong> — the right boundary of the integration region</li>
                 </ul>
 
-                <h2 id="list-item-13">Integral List</h2>
-                <p>Shows all selected integration regions.</p>
-                <ul>
-                    <li>Remove an integral by clicking the <strong>trashcan</strong> icon</li>
-                    <li>Reset the entire list by clicking the <strong>circle</strong> icon</li>
+                <h2 id="list-item-13">Peak & Integral List</h2>
+                <p>Shows all peaks detected by the algorithm & shows all selected integration regions.</p>
+                <ul class="list-group">
+                    <li class="list-group-item">Reset the entire list by clicking the <i class="bi bi-arrow-repeat"></i> <strong>circle</strong> button</li>
+                    <li class="list-group-item">Remove an item by clicking the <i class="bi bi-trash-fill"></i> <strong>trashcan</strong> button</li>
+                    <li class="list-group-item">Zoom in by clicking the <i class="bi bi-zoom-in"></i> <strong>zoom</strong> icon</li>
                 </ul>
 
             </div>

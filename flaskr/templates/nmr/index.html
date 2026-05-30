@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 
-{% block title %}NMR{% endblock %}
+{% block title %}NMR — PlotPie{% endblock %}
 
 {% block body %}
 
@@ -16,17 +16,17 @@
                     <label class="form-label" for="file">Upload dataset</label>
                     <input class="form-control" id="file" name="file" type="file">
                 </div>
-                <button class="btn btn-primary" type="submit">Upload</button>
+                <button class="btn btn-primary" type="submit"><i class="bi bi-file-earmark-arrow-up-fill"></i> Upload</button>
             </form>
 
             <!-- Delete -->
             <form action="{{ url_for('nmr.delete', filename=filename) }}" class="p-1" method="post">
-                <button class="btn btn-primary">Delete</button>
+                <button class="btn btn-primary"><i class="bi bi-file-earmark-x-fill"></i> Delete</button>
             </form>
 
             <!-- Download -->
             <form action="{{ url_for('nmr.freq_download', filename=filename) }}" class="p-1" method="get">
-                <button class="btn btn-primary">Download</button>
+                <button class="btn btn-primary"><i class="bi bi-file-earmark-arrow-down-fill"></i> Download</button>
             </form>
 
             <!-- List of the data -->
@@ -62,31 +62,31 @@
                     <input class="form-control form-control-sm" name="move_index" step="any" type="number" value="{{ settings['freq_navigation']['move_index'] }}">
                 </div>
                 <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="x_out">x-out</button>
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="x_out"><i class="bi bi-arrows-collapse-vertical"></i></button>
                 </div>
                 <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="up">up</button>
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="up"><i class="bi bi-arrow-up"></i></button>
                 </div>
                 <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="x_in">x-in</button>
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="x_in"><i class="bi bi-arrows-expand-vertical"></i></button>
                 </div>
                 <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="left">left</button>
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="left"><i class="bi bi-arrow-left"></i></button>
                 </div>
                 <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="center">center</button>
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="center"><i class="bi bi-arrows-fullscreen"></i></button>
                 </div>
                 <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="right">right</button>
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="right"><i class="bi bi-arrow-right"></i></button>
                 </div>
                 <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="y_out">y-out</button>
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="y_out"><i class="bi bi-arrows-collapse"></i></button>
                 </div>
                 <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="down">down</button>
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="down"><i class="bi bi-arrow-down"></i></button>
                 </div>
                 <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="y_in">y-in</button>
+                    <button class="btn btn-primary btn-sm w-100" name="navigate" type="submit" value="y_in"><i class="bi bi-arrows-expand"></i></button>
                 </div>
             </form>
             
@@ -121,7 +121,7 @@
                 </div>
                 <div class="col-6">
                     <label class="form-label" for="p1">p1</label>
-                    <input class="form-control form-control-sm" id="p1" name="p1" step="any" type="number" value="{{ settings['freq_phase'][p1] }}">
+                    <input class="form-control form-control-sm" id="p1" name="p1" step="any" type="number" value="{{ settings['freq_phase']['p1'] }}">
                 </div>
                 <input type="submit" hidden>
              </form>
@@ -149,11 +149,11 @@
                 </form>
                 {% if settings['freq_threshold']['bool'] %}
                     <form action="{{ url_for('nmr.freq_threshold', filename=filename) }}" class="col-6" method="post">
-                        <button class="btn btn-primary btn-sm" type="submit">Hide</button>
+                        <button class="btn btn-primary btn-sm" type="submit"><i class="bi bi-eye-slash-fill"></i> Hide</button>
                     </form>
                 {% else %}
                     <form action="{{ url_for('nmr.freq_threshold', filename=filename) }}" class="col-6" method="post">
-                        <button class="btn btn-primary btn-sm">Show</button>
+                        <button class="btn btn-primary btn-sm"><i class="bi bi-eye-fill"></i> Show</button>
                     </form>
                 {% endif %}
             </div>
@@ -164,14 +164,14 @@
 
             <!-- Peaklist -->
             <form action="{{ url_for('nmr.freq_peaks_action', filename=filename) }}" class="border p-2 rounded row" method="post">
-                <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm" name="action" value="reset" type="submit">rs</button>
+                <div class="col-4 p-2">
+                    <button class="btn btn-primary btn-sm w-100" name="action" value="reset" type="submit"><i class="bi bi-arrow-repeat"></i></button>
                 </div>
-                <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm" name="action" value="remove" type="submit">rm</button>
+                <div class="col-4 p-2">
+                    <button class="btn btn-primary btn-sm w-100" name="action" value="remove" type="submit"><i class="bi bi-trash-fill"></i></button>
                 </div>
-                <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm" name="action" value="zoom" type="submit">zm</button>
+                <div class="col-4 p-2">
+                    <button class="btn btn-primary btn-sm w-100" name="action" value="zoom" type="submit"><i class="bi bi-zoom-in"></i></button>
                 </div>
                 <div class="col-12" style="height: 35vh; overflow-y: auto; overflow-x: hidden;">
                     <table class="table table-hover table-sm">
@@ -204,14 +204,14 @@
 
             <!-- Integrallist -->
             <form action="{{ url_for('nmr.freq_integrals_action', filename=filename) }}" class="border p-2 mt-3 rounded row" method="post">
-                <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm" name="action" value="reset" type="submit">rs</button>
+                <div class="col-4 p-2">
+                    <button class="btn btn-primary btn-sm w-100" name="action" value="reset" type="submit"><i class="bi bi-arrow-repeat"></i></button>
                 </div>
-                <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm" name="action" value="remove" type="submit">rm</button>
+                <div class="col-4 p-2">
+                    <button class="btn btn-primary btn-sm w-100" name="action" value="remove" type="submit"><i class="bi bi-trash-fill"></i></button>
                 </div>
-                <div class="col-4 p-1">
-                    <button class="btn btn-primary btn-sm" name="action" value="zoom" type="submit">zm</button>
+                <div class="col-4 p-2">
+                    <button class="btn btn-primary btn-sm w-100" name="action" value="zoom" type="submit"><i class="bi bi-zoom-in"></i></button>
                 </div>
                 <div class="col-12" style="height: 35vh; overflow-y: auto; overflow-x: hidden;">
                     <table class="table table-hover table-sm">

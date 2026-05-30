@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 
-{% block title %}About{% endblock %}
+{% block title %}About — PlotPie{% endblock %}
 
 {% block body %}
 
@@ -112,28 +112,34 @@
                 the developer's B.Sc. thesis work.
             </p>
 
-            <h2>About the Developer</h2>
-            <p>
-                PlotPie is developed by Dimitri Karpov, a chemist (B.Sc.)
-                with thesis work in applied materials research at Fraunhofer
-                IFAM (Bremen). My interests sit at the intersection of
-                analytical chemistry, scientific computing, and lab
-                digitalization - NMR data processing, spectroscopy, and the
-                move toward more automated, software-driven experimental
-                workflows.
-            </p>
-            <p>
-                I built PlotPie to bring these two sides together in something
-                practical: a free, lightweight, web-based alternative to the
-                heavy desktop software that still dominates NMR analysis.
-            </p>
+            <div class="row align-items-center g-4">
+                <div class="col-12 col-lg-3">
+                    <img alt="Dimitri Karpov" class="img-fluid rounded" src="{{ url_for('static', filename='figures/my_image.webp') }}">
+                </div>
+                <div class="col-12 col-lg-9">
+                    <h2>About the Developer</h2>
+                    <p>
+                        PlotPie is developed by Dimitri Karpov, a chemist (B.Sc.)
+                        with thesis work in applied materials research at Fraunhofer
+                        IFAM (Bremen). My interests sit at the intersection of
+                        analytical chemistry, scientific computing, and lab
+                        digitalization - NMR data processing, spectroscopy, and the
+                        move toward more automated, software-driven experimental
+                        workflows.
+                    </p>
+                    <p>
+                        I built PlotPie to bring these two sides together in something
+                        practical: a free, lightweight, web-based alternative to the
+                        heavy desktop software that still dominates NMR analysis.
+                    </p>
+                </div>
+            </div>
 
             <h2>Contact</h2>
             <ul class="list-group">
-                <li class="list-group-item">GitHub: [github.com/dmadot](https://github.com/dmadot)</li>
-                <li class="list-group-item">Repository: [github.com/dmadot/project-flask](https://github.com/dmadot/project-flask)</li>
+                <li class="list-group-item">GitHub: <a href="https://github.com/dmadot">https://github.com/dmadot</a></li>
+                <li class="list-group-item">Repository: <a href="https://github.com/dmadot/project-flask">https://github.com/dmadot/project-flask</a></li>
                 <li class="list-group-item">Email: your-email</li>
-                <li class="list-group-item">LinkedIn: your-linkedin-url</li>
             </ul>
             <div class="mt-4 text-center">
                 <a class="btn btn-outline-secondary" href="{{ url_for('nmr.index') }}">Get started</a>
