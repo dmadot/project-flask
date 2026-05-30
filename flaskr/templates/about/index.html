@@ -9,24 +9,136 @@
         <div class="col-12 col-lg-2 d-none d-lg-block">
             <!-- Placeholder -->
         </div>
-        <div class="col-12 col-lg-8">
+        <div class="col-12 col-lg-8 ps-5 pe-5">
             <h1>About PlotPie</h1>
-            <p>PlotPie is a free tool for processing and visualizing scientific spectral data directly in the browser. The current version focuses on NMR spectra, where users can upload a Bruker dataset, process it, and export the spectrum as SVG.</p>
-            <p>PlotPie is built with Python, using nmrglue for spectral data processing and matplotlib for visualization. The web interface is implemented with Flask and plain HTML forms.</p>
+            <p>
+                PlotPie is a free, browser-based tool for processing and visualizing
+                scientific spectral data. The current version focuses on 1H-NMR
+                spectra recorded on Bruker spectrometers: users upload a dataset,
+                process it interactively, and export the final spectrum as SVG.
+            </p>
 
             <h2>Motivation</h2>
-            <p>NMR analysis tools are often expensive, bloated, and heavy. PlotPie was born out of a lack of good, free, web-based alternatives and a desire to build one from scratch.</p>
+            <p>
+                NMR analysis software is, with few exceptions, expensive, heavy,
+                and tied to specific operating systems. For a quick look at a
+                spectrum, a routine integration, or a clean figure for a report,
+                a full desktop suite is often more friction than the task deserves.
+            </p>
+            <p>
+                PlotPie was built to fill that gap: a lightweight web app that
+                runs anywhere a browser does, requires no installation, and
+                covers the core 1D workflow - Fourier transform, phase
+                correction, peak picking, integration, and publication-ready
+                export.
+            </p>
+            <p>
+                The longer-term motivation is broader. Analytical chemistry is
+                slowly moving toward open formats, scriptable workflows, and
+                lab digitalization. PlotPie is a small contribution in that
+                direction.
+            </p>
+
+            <h2>How It Works</h2>
+            <p>
+                PlotPie is written in Python. The scientific core is built on
+                nmrglue for reading Bruker raw data and applying spectral
+                processing, and matplotlib for rendering. The web layer is
+                a Flask application with server-rendered HTML - deliberately
+                no heavy frontend framework, to keep the project small and
+                auditable.
+            </p>
+            <p>
+                All processing happens server-side within a temporary session.
+                There is no client-side WebAssembly or browser-side number
+                crunching; the browser is the interface, not the compute layer.
+            </p>
+
+            <h2>Supported Data</h2>
+            <p>
+                <ul class="list-group">
+                    <li class="list-group-item">Format: Bruker (TopSpin folder structure), uploaded as ZIP</li>
+                    <li class="list-group-item">Experiments: 1D 1H-NMR</li>
+                    <li class="list-group-item">Output: SVG (vector, ready for publications and reports)</li>
+                </ul>
+                <p>
+                    Support for additional nuclei (13C, 31P, 19F) and 2D experiments
+                    is being considered for future versions.
+                </p>
+            </p>
+
+            <h2>Data Handling and Privacy</h2>
+            <p>
+                Uploaded files are extracted into an isolated session workspace,
+                processed, and discarded when the session ends. No spectra,
+                identifiers, or processed results are persisted on the server
+                or shared with third parties. PlotPie does not use trackers
+                or analytics.
+            </p>
 
             <h2>Project Status</h2>
-            <p>PlotPie is experimental and under active development — features may change and additional spectroscopic methods may be added over time.</p>
+            <p>
+                PlotPie is experimental and under active development. The
+                codebase is open and available on GitHub. Bug reports, feature
+                suggestions, and contributions are welcome.
+            </p>
 
-            <h2>Data Handling</h2>
-            <p>Uploaded files are used only for processing and visualization within the current session. No user data is stored long-term.</p>
+            <h2>Roadmap</h2>
+            <p>
+                Planned and considered for future versions:
+                <ul class="list-group">
+                    <li class="list-group-item">Additional nuclei (13C, 19F, 31P)</li>
+                    <li class="list-group-item">2D NMR (COSY, HSQC) basic visualization</li>
+                    <li class="list-group-item">Nativ TikZ export</li>
+                </ul>
+            </p>
+
+            <h2 id="demo">Try It with a Demo Dataset</h2>
+            <p>
+                A small example dataset is available so you can try the full
+                workflow without your own Bruker data:
+            </p>
+                <p>
+                📥 
+                <a href="https://github.com/dmadot/project-flask/raw/master/example_data/furfurylamine.zip" download="furfurylamine.zip">
+                    Download demo dataset (furfurylamine.zip, ~1.7 MB)
+                </a>
+                <br>
+                <small>1H-NMR spectrum of furfurylamine, Bruker format.
+                Upload it directly on the <a href="/nmr/">NMR page</a> to try PlotPie.</small>
+            </p>
+            <p>
+                The spectrum is a 1H-NMR of furfurylamine, recorded during
+                the developer's B.Sc. thesis work.
+            </p>
 
             <h2>About the Developer</h2>
-            <p>PlotPie is developed as a personal project by an analytical chemist with an interest in scientific computing. The project started as a way to combine chemistry knowledge and programming skills, with the goal of building practical tools for processing and presenting experimental data.</p>
-            <p><a href="https://github.com/dmadot/project-flask">github.com/dmadot/project-flask</a></p>
-            <p><a href="{{ url_for('nmr.index') }}">Get started</a> or <a href="{{ url_for('learn.index') }}">learn how to use</a>.</p>
+            <p>
+                PlotPie is developed by Dimitri Karpov, a chemist (B.Sc.)
+                with thesis work in applied materials research at Fraunhofer
+                IFAM (Bremen). My interests sit at the intersection of
+                analytical chemistry, scientific computing, and lab
+                digitalization - NMR data processing, spectroscopy, and the
+                move toward more automated, software-driven experimental
+                workflows.
+            </p>
+            <p>
+                I built PlotPie to bring these two sides together in something
+                practical: a free, lightweight, web-based alternative to the
+                heavy desktop software that still dominates NMR analysis.
+            </p>
+
+            <h2>Contact</h2>
+            <ul class="list-group">
+                <li class="list-group-item">GitHub: [github.com/dmadot](https://github.com/dmadot)</li>
+                <li class="list-group-item">Repository: [github.com/dmadot/project-flask](https://github.com/dmadot/project-flask)</li>
+                <li class="list-group-item">Email: your-email</li>
+                <li class="list-group-item">LinkedIn: your-linkedin-url</li>
+            </ul>
+            <div class="mt-4 text-center">
+                <a class="btn btn-outline-secondary" href="{{ url_for('nmr.index') }}">Get started</a>
+                <a class="btn btn-outline-secondary ms-2" href="{{ url_for('learn.index') }}">Learn more</a>
+            </div>
         </div>
         <div class="col-12 col-lg-2 d-none d-lg-block">
             <!-- Placeholder -->

@@ -10,14 +10,94 @@
             <!-- Placeholder -->
         </div>
         <div class="col-12 col-lg-8 text-center">
-            <p class="display-6 fw-bold">Process and visualize NMR spectra in the browser for free</p>
-            <p class="lead mt-4">Upload a Bruker dataset and export your spectrum as SVG</p>
-            <p class="lead">No software to install, No data stored</p>
-            <div class="mt-4">
+            <div class="col-12">
+                <p class="display-6 fw-bold">Process and visualize NMR spectra in the browser for free</p>
+                <p class="lead mt-4">Upload a Bruker dataset and export your spectrum as SVG</p>
+                <p class="lead">No software to install, No data stored</p>
+            </div>
+
+            <hr class="border-2 border-secondary mt-4">
+
+            <div class="d-flex flex-wrap justify-content-center gap-3 text-muted">
+                <span>FFT</span>
+                <span>*</span>
+                <span>Phase Correction</span>
+                <span>*</span>
+                <span>Peak Picking</span>
+                <span>*</span>
+                <span>Integration</span>
+                <span>*</span>
+                <span>SVG Export</span>
+            </div>
+
+            <hr class="border-2 border-secondary">
+
+
+            <div class="col-12">
+                <figure class="figure w-80">
+                    <img alt="1H-NMR spectrum of furfurylamine processed with PlotPie"
+                        class="figure-img img-fluid rounded"
+                        src="{{ url_for('static', filename='figures/furfurylamine_freq(1).svg') }}">
+                </figure>
+            </div>
+            <div class="col-12 mt-4">
                 <a class="btn btn-outline-secondary" href="{{ url_for('nmr.index') }}">Get started</a>
                 <a class="btn btn-outline-secondary ms-2" href="{{ url_for('about.index') }}">Learn more</a>
+                <a class="btn btn-outline-secondary ms-2" href="{{ url_for('about.index') }}#demo">Try with demo dataset</a>
+            </div>
+
+            <div class="accordion mt-4" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                        Which file formats are supported? 
+                    </button>
+                    </h2>
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            Bruker TopSpin folder, as ZIP
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+                        Is my data stored?
+                    </button>
+                    </h2>
+                    <div id="flush-collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            No, sessions are temporary    
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+                        Can I use the SVG output in publications?
+                    </button>
+                    </h2>
+                    <div id="flush-collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            Yes, it's vector and license-free
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseFour" aria-expanded="false" aria-controls="flush-collapseFour">
+                        Does it work for 13C / 2D? 
+                    </button>
+                    </h2>
+                    <div id="flush-collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            Not yet, see Roadmap
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        
         <div class="col-12 col-lg-2 d-none d-lg-block">
             <!-- Placeholder -->
         </div>
